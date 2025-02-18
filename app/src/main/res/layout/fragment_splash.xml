@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:alpha="0.8"
+    > <!-- Фон экрана -->
+
+    <!-- Фоновое изображение с мягким градиентом -->
+    <ImageView
+        android:id="@+id/splash_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/z1"
+        android:alpha="0.4" />
+
+    <!-- Круглый логотип с мягким розовым оттенком -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/logo"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"
+        android:src="@drawable/z6"
+        app:shapeAppearanceOverlay="@style/RoundedImageView"
+        android:backgroundTint="@color/bright_purple_medium"/>
+
+    <!-- LinearLayout для названия приложения -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_marginTop="220dp"> <!-- Отступ от центра -->
+
+        <!-- Первое слово -->
+        <TextView
+            android:id="@+id/app_name_first"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="WEATHER"
+            android:textAlignment="center"
+            android:textColor="@color/bright_pink_light"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:shadowColor="@color/bright_pink_dark"
+            android:shadowRadius="3"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:visibility="gone"/>
+
+        <!-- Второе слово -->
+        <TextView
+            android:id="@+id/app_name_second"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MAKE"
+            android:layout_marginTop="10dp"
+            android:textAlignment="center"
+            android:textColor="@color/bright_pink_dark"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:shadowColor="@color/bright_purple_medium"
+            android:shadowRadius="3"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:visibility="gone"/>
+
+        <!-- Третье слово -->
+        <TextView
+            android:id="@+id/app_name_third"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TOGETHER"
+            android:layout_marginTop="10dp"
+            android:textAlignment="center"
+            android:textColor="@color/bright_pink_medium"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:shadowColor="@color/bright_purple_light"
+            android:shadowRadius="3"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+</FrameLayout>
