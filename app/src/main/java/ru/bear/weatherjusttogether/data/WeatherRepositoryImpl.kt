@@ -1,13 +1,10 @@
 package ru.bear.weatherjusttogether.data
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import ru.bear.weatherjusttogether.data.API.API_KEY
+import ru.bear.weatherjusttogether.network.models.Hour
 import ru.bear.weatherjusttogether.network.api.WeatherApi
+import ru.bear.weatherjusttogether.network.models.ForecastResponse
+import ru.bear.weatherjusttogether.network.models.Location
 import ru.bear.weatherjusttogether.network.models.WeatherResponse
 import javax.inject.Inject
 
@@ -20,7 +17,7 @@ class WeatherRepositoryImpl @Inject constructor(
 
     override suspend fun getWeather(city: String): WeatherResponse? {
         return try {
-            weatherApi.getCurrentWeather(API_KEY, city)
+            weatherApi.getCurrentWeather(API_KEY, city,  "ru")
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -28,29 +25,36 @@ class WeatherRepositoryImpl @Inject constructor(
     }
 
 
-    /*
-    override fun getWeather(city: String, callback: (WeatherResponse?) -> Unit) {
-        // CoroutineScope(Dispatchers.IO).launch: Используется для выполнения запроса в фоновом
-        // потоке
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = weatherApi.getCurrentWeather(API_KEY, city)
-                // withContext(Dispatchers.Main): Переключает поток обратно на главный, чтобы
-                // обновить UI
-                withContext(Dispatchers.Main) {
-                    callback(response)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                withContext(Dispatchers.Main) {
-                    callback(null) // Возвращаем null в случае ошибки
-                }
-            }
+    override suspend fun getCitySuggestions(query: String): List<Location> {
+        return try {
+            weatherApi.getCitySuggestions(API_KEY, query,  "ru")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
         }
     }
-    */
 
-    companion object {
-        private const val API_KEY = "api_key"
+    override suspend fun getForecast(city: String): ForecastResponse? {
+        return try {
+            weatherApi.getForecast(API_KEY, city, days = "14",  lang = "ru")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
+
+    /**
+     * Получение почасового прогноза на текущий день
+     * Данные берутся из первого элемента forecastday -> hour
+     */
+    override suspend fun getHourlyForecast(city: String): List<Hour>? {
+        return try {
+            val forecastResponse = weatherApi.getForecast(API_KEY, city, days = "1", lang = "ru")
+            forecastResponse?.forecast?.forecastday?.get(0)?.hour
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
 }

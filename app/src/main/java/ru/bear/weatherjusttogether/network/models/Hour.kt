@@ -1,7 +1,8 @@
 package ru.bear.weatherjusttogether.network.models
 
-data class CurrentWeather(
-    val last_updated: String,
+data class Hour(
+    val time_epoch: Long,
+    val time: String,
     val temp_c: Double,
     val temp_f: Double,
     val is_day: Int,
@@ -14,13 +15,24 @@ data class CurrentWeather(
     val pressure_in: Double,
     val precip_mm: Double,
     val precip_in: Double,
+    val snow_cm: Double,
     val humidity: Int,
     val cloud: Int,
     val feelslike_c: Double,
     val feelslike_f: Double,
+    val windchill_c: Double,
+    val windchill_f: Double,
+    val heatindex_c: Double,
+    val heatindex_f: Double,
+    val dewpoint_c: Double,
+    val dewpoint_f: Double,
+    val will_it_rain: Int,
+    val chance_of_rain: Int,
+    val will_it_snow: Int,
+    val chance_of_snow: Int,
     val vis_km: Double,
     val vis_miles: Double,
-    val uv: Double,
     val gust_mph: Double,
-    val gust_kph: Double
+    val gust_kph: Double,
+    val uv: Double
 )

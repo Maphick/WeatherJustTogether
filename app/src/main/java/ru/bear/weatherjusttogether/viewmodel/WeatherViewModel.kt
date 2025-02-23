@@ -8,25 +8,62 @@ import ru.bear.weatherjusttogether.data.WeatherRepository
 import javax.inject.Inject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import ru.bear.weatherjusttogether.network.models.Location
 import ru.bear.weatherjusttogether.network.models.WeatherResponse
 
-// Внедряем WeatherRepository в ViewModel
 class WeatherViewModel @Inject constructor(
-    // WeatherViewModel подключён к Dagger
     private val repository: WeatherRepository
 ) : ViewModel() {
 
+    // для хранения текущей погоды
     private val _weather = MutableLiveData<WeatherResponse?>()
     val weather: LiveData<WeatherResponse?> get() = _weather
 
-    fun loadWeather(city: String) {
-        // Оптимальный вариант для Android-приложения:
-        // Репозиторий использует suspend
-        // В ViewModel используем viewModelScope.launch
-        // В Fragment подписываемся на LiveData:
-        viewModelScope.launch {
-            _weather.value = repository.getWeather(city)
+    //  для хранения списка городов
+    private val _citySuggestions = MutableLiveData<List<Location>>()
+    val citySuggestions: LiveData<List<Location>> get() = _citySuggestions
+
+
+    // fetchWeather() выполняет запрос погоды по текущему городу
+    fun fetchWeather(city: String) {
+        // Dispatchers.IO для сетевого запроса, чтобы не блокировать UI-поток.
+        viewModelScope.launch(Dispatchers.IO) {
+            // обработка ошибок через try-catch, чтобы приложение не крашилось при ошибках сети.
+            try {
+                val response = repository.getWeather(city)
+                withContext(Dispatchers.Main) {
+                    _weather.value = response
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    _weather.value = null // Можно обработать ошибку через другой LiveData
+                }
+            }
         }
     }
+
+
+    //  выполняет запрос для получения списка городов с помощью WeatherAPI:
+    fun fetchCitySuggestions(city: String, callback: (List<Location>) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = repository.getCitySuggestions(city)
+                withContext(Dispatchers.Main) {
+                    _citySuggestions.value = response
+                    callback(response)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    _citySuggestions.value = emptyList()
+                    callback(emptyList())
+                }
+            }
+        }
+    }
+
 }

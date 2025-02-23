@@ -1,100 +1,68 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="12dp"
-    android:elevation="2dp">
-
-    <!-- Дата -->
-    <TextView
-        android:id="@+id/daily_date"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:text="28 Янв"
-        android:textSize="18sp"
-        android:textColor="@color/text_bright"
-        android:textStyle="bold"
-        android:layout_gravity="center_vertical"/>
-
-    <!-- Температура -->
-    <TextView
-        android:id="@+id/daily_temp"
-        android:layout_width="110dp"
-        android:layout_height="wrap_content"
-        android:text="Макс 25°, Мин 16°"
-        android:textSize="18sp"
-        android:textColor="@color/text_bright"
-        android:layout_marginStart="8dp"
-        android:layout_gravity="center_vertical"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/rounded_transparent_bg"
+    android:padding="16dp"
+    android:layout_margin="8dp"
+    android:elevation="4dp">
 
     <!-- Иконка погоды -->
     <ImageView
-        android:id="@+id/daily_icon"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginStart="8dp"
-        android:src="@drawable/ic_cloudy"
-        app:tint="@color/weather_icon_color"
-        android:layout_gravity="center_vertical"/>
+        android:id="@+id/conditionIcon"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        app:tint="@color/weather_icon_color" />
 
-    <!-- Дополнительные параметры -->
-    <LinearLayout
+    <!-- Дата -->
+    <TextView
+        android:id="@+id/dateText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_toEndOf="@id/conditionIcon"
         android:layout_marginStart="16dp"
-        android:layout_weight="1">
+        android:textSize="25sp"
+        android:textColor="@color/bright_purple_dark"
+        android:fontFamily="@font/greatvibesregular"
+        android:textStyle="bold" />
 
-        <!-- Осадки -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+    <!-- Описание погоды (условие) -->
+    <TextView
+        android:id="@+id/conditionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dateText"
+        android:layout_toEndOf="@id/conditionIcon"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:textSize="20sp"
+        android:textColor="@color/bright_purple_light"
+        android:fontFamily="@font/greatvibesregular" />
 
-            <TextView
-                android:id="@+id/daily_precip_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Осадки:"
-                android:textSize="16sp"
-                android:textColor="@color/text_bright"
-                android:textStyle="bold"/>
+    <!-- Максимальная температура -->
+    <TextView
+        android:id="@+id/maxTempText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:textSize="30sp"
+        android:textColor="@color/bright_pink_dark"
+        android:fontFamily="@font/greatvibesregular"
+        android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/daily_precip_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="30%"
-                android:textSize="16sp"
-                android:textColor="@color/text_bright"
-                android:layout_marginStart="4dp"/>
-        </LinearLayout>
-
-        <!-- Ветер -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="4dp">
-
-            <TextView
-                android:id="@+id/daily_wind_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ветер:"
-                android:textSize="16sp"
-                android:textColor="@color/text_bright"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/daily_wind_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="10 км/ч"
-                android:textSize="16sp"
-                android:textColor="@color/text_bright"
-                android:layout_marginStart="4dp"/>
-        </LinearLayout>
-    </LinearLayout>
-</LinearLayout>
+    <!-- Минимальная температура -->
+    <TextView
+        android:id="@+id/minTempText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/maxTempText"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="4dp"
+        android:textSize="22sp"
+        android:textColor="@color/bright_purple_dark"
+        android:fontFamily="@font/greatvibesregular" />
+</RelativeLayout>

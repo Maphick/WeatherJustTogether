@@ -1,51 +1,82 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bright_purple_light"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="@color/bright_purple_light">
 
     <!-- Фоновое изображение -->
+
+    <!-- Верхняя панель с поиском -->
     <ImageView
         android:id="@+id/weather_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
         android:alpha="0.5"
+        android:scaleType="centerCrop"
         android:src="@drawable/cloudly" />
 
-    <!-- Верхняя панель -->
     <RelativeLayout
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:layout_marginTop="40dp"
-        android:elevation="6dp">
+        android:elevation="6dp"
+        android:padding="16dp">
 
         <TextView
-            android:id="@+id/hourly_title"
+            android:id="@+id/page_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text = "Почасовой прогноз"
-            android:textSize="34sp"
+            android:layout_margin="0.dp"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/greatvibesregular"
+            android:text="Прогноз по часам"
             android:textColor="@color/bright_pink_dark"
-            android:textStyle="bold"
-            android:shadowColor="@color/bright_purple_dark"
-            android:shadowRadius="3"
-            android:shadowDx="1"
-            android:shadowDy="1"/>
+            android:textSize="40sp" />
+
+        <!-- Кнопка настроек выше поля поиска -->
+        <ImageButton
+            android:id="@+id/btnSettings"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="20dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_settings"
+            app:tint="@color/text_bright" />
     </RelativeLayout>
 
-    <!-- Почасовой прогноз (Список) -->
+    <RelativeLayout
+        android:id="@+id/city_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/top_bar"
+        android:gravity="left"
+        android:orientation="horizontal"
+        android:paddingStart="16dp">
+        <!-- Название города -->
+        <TextView
+            android:id="@+id/city_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="0.dp"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/greatvibesregular"
+            android:text="London"
+            android:textColor="@color/bright_purple_dark"
+            android:textSize="34sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+
+    <!-- RecyclerView для почасового прогноза -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/hourlyRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/top_bar"
-        android:layout_marginTop="0dp"
+        android:layout_below="@id/city_info"
+        android:layout_marginTop="16dp"
         android:clipToPadding="false"
         android:padding="8dp"
         android:scrollbars="vertical" />
-
 </RelativeLayout>

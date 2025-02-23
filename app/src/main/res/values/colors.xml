@@ -26,4 +26,11 @@
 
         <color name="weather_icon_color">#FF6EC7</color> <!-- для иконок -->
 
+
+        <color name="sunny_color">#FFD700</color> <!-- Ярко-желтый -->
+        <color name="cloudy_color">#949393</color> <!-- Серый -->
+        <color name="snow_color">#D5D4D4</color> <!-- Белый -->
+        <color name="rainy_color">#2196F3</color> <!-- Синий -->
+
+
 </resources>
