@@ -61,4 +61,7 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
     implementation(libs.gson)
+    // GLIDE
+    implementation(libs.glide)
+    kapt(libs.glide.compiler)
 }

@@ -3,17 +3,17 @@
     <item
         android:id="@+id/nav_home"
         android:icon="@drawable/ic_home"
-        android:title="Home" />
+        android:title="Главная" />
     <item
         android:id="@+id/nav_hourly"
         android:icon="@drawable/ic_hourly"
-        android:title="Hourly" />
+        android:title="По часам" />
     <item
         android:id="@+id/nav_daily"
         android:icon="@drawable/ic_daily"
-        android:title="Daily" />
+        android:title="По дням" />
     <item
         android:id="@+id/nav_alerts"
         android:icon="@drawable/ic_alerts"
-        android:title="Alerts" />
+        android:title="Оповещания" />
 </menu>

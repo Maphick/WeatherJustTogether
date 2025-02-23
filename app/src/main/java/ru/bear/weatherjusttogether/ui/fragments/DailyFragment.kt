@@ -1,20 +1,49 @@
 package ru.bear.weatherjusttogether.ui.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ru.bear.weatherjusttogether.R
+import ru.bear.weatherjusttogether.WeatherApp
 import ru.bear.weatherjusttogether.adapters.DailyAdapter
-import ru.bear.weatherjusttogether.models.DailyWeather
-
+import ru.bear.weatherjusttogether.viewmodel.ForecastViewModel
+import ru.bear.weatherjusttogether.viewmodel.ForecastViewModelFactory
+import ru.bear.weatherjusttogether.viewmodel.SharedViewModel
+import ru.bear.weatherjusttogether.viewmodel.WeatherViewModel
+import ru.bear.weatherjusttogether.viewmodel.WeatherViewModelFactory
+import javax.inject.Inject
 
 class DailyFragment : Fragment() {
+    @Inject
+    lateinit var viewModelFactory: ForecastViewModelFactory
+    private lateinit var viewModel: ForecastViewModel
+    private lateinit var sharedViewModel: SharedViewModel
 
     private lateinit var dailyRecyclerView: RecyclerView
+
+    private lateinit var cityNameText: TextView
+    private var selectedCity: String? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as WeatherApp).appComponent.inject(this)
+
+        // Инициализируем sharedViewModel
+        sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
+
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        selectedCity = arguments?.getString("selected_city", "Москва")
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,46 +55,33 @@ class DailyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        VMSettings()
+
         dailyRecyclerView = view.findViewById(R.id.dailyRecyclerView)
-        dailyRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        cityNameText = view.findViewById(R.id.city_name)
+        dailyRecyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
 
-        val dailyList = listOf(
-            DailyWeather("Сегодня", 25, 16, R.drawable.ic_cloudy, 30, "10 км/ч"),
-            DailyWeather("Завтра", 27, 18, R.drawable.ic_sunny, 10, "15 км/ч"),
-            DailyWeather("1 февраля", 25, 16, R.drawable.ic_cloudy, 30, "10 км/ч"),
-            DailyWeather("2 февраля", 27, 18, R.drawable.ic_sunny, 10, "15 км/ч"),
-            DailyWeather("3 февраля", 25, 16, R.drawable.ic_cloudy, 30, "10 км/ч"),
-            DailyWeather("4 февраля", 27, 18, R.drawable.ic_sunny, 10, "15 км/ч"),
-            DailyWeather("5 февраля", 25, 16, R.drawable.ic_cloudy, 30, "10 км/ч"),
-            DailyWeather("6 февраля", 27, 18, R.drawable.ic_sunny, 10, "15 км/ч"),
-            DailyWeather("7 февраля", 25, 16, R.drawable.ic_cloudy, 30, "10 км/ч"),
-            DailyWeather("8 февраля", 27, 18, R.drawable.ic_sunny, 10, "15 км/ч"),
-            DailyWeather("9 февраля", 25, 16, R.drawable.ic_cloudy, 30, "10 км/ч"),
-            DailyWeather("10 февраля", 27, 18, R.drawable.ic_sunny, 10, "15 км/ч"),
-            DailyWeather("11 февраля", 25, 16, R.drawable.ic_cloudy, 30, "10 км/ч"),
-            DailyWeather("12 февраля", 27, 18, R.drawable.ic_sunny, 10, "15 км/ч"),
-            DailyWeather("13 февраля", 25, 16, R.drawable.ic_cloudy, 30, "10 км/ч"),
-            DailyWeather("14 февраля", 27, 18, R.drawable.ic_sunny, 10, "15 км/ч"),
-            DailyWeather("15 февраля", 25, 16, R.drawable.ic_cloudy, 30, "10 км/ч"),
-            DailyWeather("16 февраля", 27, 18, R.drawable.ic_sunny, 10, "15 км/ч"),
-            DailyWeather("17 февраля", 25, 16, R.drawable.ic_cloudy, 30, "10 км/ч"),
-            DailyWeather("18 февраля", 27, 18, R.drawable.ic_sunny, 10, "15 км/ч"),
-            DailyWeather("19 февраля", 25, 16, R.drawable.ic_cloudy, 30, "10 км/ч"),
-            DailyWeather("20 февраля", 27, 18, R.drawable.ic_sunny, 10, "15 км/ч"),
-            DailyWeather("21 февраля", 25, 16, R.drawable.ic_cloudy, 30, "10 км/ч"),
-            DailyWeather("22 февраля", 27, 18, R.drawable.ic_sunny, 10, "15 км/ч"),
-            DailyWeather("23 февраля", 25, 16, R.drawable.ic_cloudy, 30, "10 км/ч"),
-            DailyWeather("24 февраля", 27, 18, R.drawable.ic_sunny, 10, "15 км/ч"),
-            DailyWeather("25 февраля", 25, 16, R.drawable.ic_cloudy, 30, "10 км/ч"),
-            DailyWeather("26 февраля", 27, 18, R.drawable.ic_sunny, 10, "15 км/ч"),
-            DailyWeather("27 февраля", 25, 16, R.drawable.ic_cloudy, 30, "10 км/ч"),
-            DailyWeather("28 февраля", 27, 18, R.drawable.ic_sunny, 10, "15 км/ч"),
-            DailyWeather("29 февраля", 25, 16, R.drawable.ic_cloudy, 30, "10 км/ч"),
-            DailyWeather("30 февраля", 27, 18, R.drawable.ic_sunny, 10, "15 км/ч"),
+        // Инициализация SharedViewModel
+        sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
+        // Наблюдаем за изменениями выбранного города
+        sharedViewModel.selectedCity.observe(viewLifecycleOwner) { city ->
+            city?.let {
+                // Отображаем название выбранного города
+                cityNameText.text = it
+                viewModel.fetchForecast(it)
+            }
+        }
 
+        viewModel.forecast.observe(viewLifecycleOwner) { forecastResponse ->
+            forecastResponse?.let {
+                val dailyList = it.forecast.forecastday
+                dailyRecyclerView.adapter = DailyAdapter(dailyList)
+            }
+        }
 
-            )
+    }
 
-        dailyRecyclerView.adapter = DailyAdapter(dailyList)
+    private fun VMSettings() {
+        viewModel = ViewModelProvider(this, viewModelFactory).get(ForecastViewModel::class.java)
     }
 }

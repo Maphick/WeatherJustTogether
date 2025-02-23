@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,48 +5,79 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- Фоновое изображение -->
+
+    <!-- Верхняя панель с поиском -->
     <ImageView
         android:id="@+id/weather_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
         android:alpha="0.5"
+        android:scaleType="centerCrop"
         android:src="@drawable/cloudly" />
 
-    <!-- Верхняя панель -->
     <RelativeLayout
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:layout_marginTop="40dp"
         android:elevation="6dp">
 
         <TextView
-            android:id="@+id/daily_title"
+            android:id="@+id/page_name"
+            android:layout_margin="0.dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text = "Прогноз на неделю"
-            android:textSize="34sp"
+            android:text="Прогноз по дням"
+            android:textSize="40sp"
             android:textColor="@color/bright_pink_dark"
+            android:fontFamily="@font/greatvibesregular"
+            android:layout_marginTop="10dp"/>
+
+        <!-- Кнопка настроек выше поля поиска -->
+        <ImageButton
+            android:id="@+id/btnSettings"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_alignParentEnd="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_settings"
+            app:tint="@color/text_bright"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/city_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:layout_below="@id/top_bar"
+        >
+        <!-- Название города -->
+        <TextView
+            android:id="@+id/city_name"
+            android:layout_margin="0.dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="London"
+            android:textSize="34sp"
+            android:textColor="@color/bright_purple_dark"
+            android:fontFamily="@font/greatvibesregular"
+            android:layout_centerHorizontal="true"
             android:textStyle="bold"
-            android:shadowColor="@color/bright_purple_dark"
-            android:shadowRadius="3"
-            android:shadowDx="1"
-            android:shadowDy="1"/>
+            android:layout_marginTop="10dp"/>
     </RelativeLayout>
 
 
-    <!-- RecyclerView для списка дней -->
+    <!-- RecyclerView для прогноза на 14 дней -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/dailyRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/top_bar"
+        android:layout_below="@+id/city_info"
         android:layout_marginTop="0dp"
         android:clipToPadding="false"
         android:padding="8dp"
-        android:scrollbars="vertical" />
-
-
+        android:scrollbars="horizontal" />
 </RelativeLayout>
