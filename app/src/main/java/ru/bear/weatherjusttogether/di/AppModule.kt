@@ -1,26 +1,24 @@
 package ru.bear.weatherjusttogether.di
 
-import android.util.Log
+import android.app.Application
+import android.content.Context
+import androidx.room.Room
 import dagger.Module
 import dagger.Provides
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
-import okio.Buffer
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import ru.bear.weatherjusttogether.data.WeatherRepository
-import ru.bear.weatherjusttogether.data.WeatherRepositoryImpl
-import ru.bear.weatherjusttogether.network.api.WeatherApi
+import ru.bear.weatherjusttogether.data.local.WeatherDatabase
+import ru.bear.weatherjusttogether.data.local.dao.WeatherDao
+import ru.bear.weatherjusttogether.domain.repository.WeatherRepository
+import ru.bear.weatherjusttogether.data.repository.WeatherRepositoryImpl
+import ru.bear.weatherjusttogether.data.remote.network.api.WeatherApi
 import ru.bear.weatherjusttogether.utils.LoggingInterceptor
-import ru.bear.weatherjusttogether.viewmodel.ForecastViewModelFactory
-import ru.bear.weatherjusttogether.viewmodel.HourlyViewModelFactory
+import ru.bear.weatherjusttogether.viewmodel.DailyForecastViewModelFactory
+import ru.bear.weatherjusttogether.viewmodel.HourlyForecastViewModelFactory
 import ru.bear.weatherjusttogether.viewmodel.SharedViewModel
-import ru.bear.weatherjusttogether.viewmodel.WeatherViewModelFactory
-import java.io.IOException
+import ru.bear.weatherjusttogether.viewmodel.TodayForecastViewModelFactory
 import javax.inject.Singleton
 
 // Этот модуль будет создавать зависимости (Retrofit, API и Repository).
@@ -30,6 +28,11 @@ object AppModule {
 
     private const val BASE_URL = "https://api.weatherapi.com/"
 
+    @Provides
+    @Singleton
+    fun provideApplication(context: Context): Application {
+        return context.applicationContext as Application
+    }
 
     @Provides
     @Singleton
@@ -58,28 +61,54 @@ object AppModule {
         return retrofit.create(WeatherApi::class.java)
     }
 
+
+    /*** 🔹 Подключаем Room ***/
     @Provides
     @Singleton
-    fun provideWeatherRepository(api: WeatherApi): WeatherRepository {
-        return WeatherRepositoryImpl(api)
+    fun provideDatabase(context: Context): WeatherDatabase {
+        return Room.databaseBuilder(
+            context.applicationContext,
+            WeatherDatabase::class.java,
+            "weather_database"
+        ).fallbackToDestructiveMigration()
+            .build()
+    }
+
+
+    //  Используем единый WeatherDao вместо нескольких
+    @Provides
+    fun provideWeatherDao(database: WeatherDatabase): WeatherDao {
+        return database.weatherDao()
+    }
+
+    /*** 🔹 Подключаем WeatherRepository в Dagger ***/
+    @Provides
+    @Singleton
+    fun provideWeatherRepository(
+        api: WeatherApi,
+        weatherDao: WeatherDao
+    ): WeatherRepository {
+        return WeatherRepositoryImpl(api, weatherDao)
     }
 
     @Provides
     @Singleton
-    fun provideWeatherViewModelFactory(repository: WeatherRepository): WeatherViewModelFactory {
-        return WeatherViewModelFactory(repository)
+    fun provideWeatherViewModelFactory(
+        repository: WeatherRepository,
+        application: Application
+    ): TodayForecastViewModelFactory {
+        return TodayForecastViewModelFactory(repository, application)
+    }
+    @Provides
+    @Singleton
+    fun provideForecastViewModelFactory(repository: WeatherRepository): DailyForecastViewModelFactory {
+        return DailyForecastViewModelFactory(repository)
     }
 
     @Provides
     @Singleton
-    fun provideForecastViewModelFactory(repository: WeatherRepository): ForecastViewModelFactory {
-        return ForecastViewModelFactory(repository)
-    }
-
-    @Provides
-    @Singleton
-    fun provideHourlyViewModelFactory(repository: WeatherRepository): HourlyViewModelFactory {
-        return HourlyViewModelFactory(repository)
+    fun provideHourlyViewModelFactory(repository: WeatherRepository): HourlyForecastViewModelFactory {
+        return HourlyForecastViewModelFactory(repository)
     }
 
     @Provides

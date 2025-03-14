@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import ru.bear.weatherjusttogether.R
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import ru.bear.weatherjusttogether.adapters.AlertsAdapter
+import ru.bear.weatherjusttogether.ui.adapters.AlertsAdapter
 import ru.bear.weatherjusttogether.models.WeatherAlert
 
 

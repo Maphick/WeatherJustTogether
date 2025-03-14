@@ -10,6 +10,6 @@ class WeatherApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        appComponent = DaggerAppComponent.create()
+        appComponent = DaggerAppComponent.factory().create(this) // 🔹 Передаем `this` как `Context`
     }
 }

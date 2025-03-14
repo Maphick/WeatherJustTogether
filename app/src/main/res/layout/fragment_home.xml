@@ -107,7 +107,7 @@
         android:layout_margin="0.dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="London"
+        android:text=""
         android:textSize="34sp"
         android:textColor="@color/bright_purple_dark"
         android:fontFamily="@font/greatvibesregular"

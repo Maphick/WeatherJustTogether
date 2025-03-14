@@ -7,22 +7,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.launch
 import ru.bear.weatherjusttogether.R
 import ru.bear.weatherjusttogether.WeatherApp
-import ru.bear.weatherjusttogether.adapters.HourlyAdapter
-import ru.bear.weatherjusttogether.models.HourlyWeather
-import ru.bear.weatherjusttogether.viewmodel.HourlyViewModel
-import ru.bear.weatherjusttogether.viewmodel.HourlyViewModelFactory
+import ru.bear.weatherjusttogether.ui.adapters.HourlyAdapter
+import ru.bear.weatherjusttogether.viewmodel.HourlyForecastViewModel
+import ru.bear.weatherjusttogether.viewmodel.HourlyForecastViewModelFactory
 import ru.bear.weatherjusttogether.viewmodel.SharedViewModel
 import javax.inject.Inject
 
 class HourlyFragment : Fragment() {
     @Inject
-    lateinit var viewModelFactory: HourlyViewModelFactory
-    private lateinit var viewModel: HourlyViewModel
+    lateinit var viewModelFactory: HourlyForecastViewModelFactory
+    private lateinit var viewModel: HourlyForecastViewModel
     private lateinit var sharedViewModel: SharedViewModel
 
     private lateinit var hourlyRecyclerView: RecyclerView
@@ -58,22 +61,29 @@ class HourlyFragment : Fragment() {
         cityNameText = view.findViewById(R.id.city_name)
         hourlyRecyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
 
+        // Создаем адаптер один раз
+        val hourlyAdapter = HourlyAdapter()
+        hourlyRecyclerView.adapter = hourlyAdapter
+
         // Наблюдаем за изменениями выбранного города
         sharedViewModel.selectedCity.observe(viewLifecycleOwner) { city ->
             city?.let {
                 cityNameText.text = it
-                viewModel.fetchHourlyForecast(it)
+                viewModel.updateCity(it) // ✅ Теперь просто обновляем город
             }
         }
 
+        // Подписываемся на LiveData
         viewModel.hourlyForecast.observe(viewLifecycleOwner) { hourlyData ->
-            hourlyData?.let {
-                hourlyRecyclerView.adapter = HourlyAdapter(it)
+            if (!hourlyData.isNullOrEmpty()) {
+                hourlyAdapter.submitList(hourlyData) // ✅ Обновляем список
             }
         }
     }
 
+
+
     private fun VMSettings() {
-        viewModel = ViewModelProvider(this, viewModelFactory).get(HourlyViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(HourlyForecastViewModel::class.java)
     }
 }
