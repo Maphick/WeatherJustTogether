@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "ru.bear.weatherjusttogether"
-        minSdk = 35
+        minSdk = 33
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -64,4 +64,10 @@ dependencies {
     // GLIDE
     implementation(libs.glide)
     kapt(libs.glide.compiler)
+    // ROOM
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    kapt(libs.room.compiler)
+    // LIFECYCLE
+    implementation(libs.lifecycle.runtime.ktx) // 🔹 Теперь используем alias из `libs.versions.toml`
 }

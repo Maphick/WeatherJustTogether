@@ -23,7 +23,7 @@
     <!-- Температура -->
     <TextView
         android:id="@+id/hourly_temp"
-        android:layout_width="50dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:text="15°C"
         android:textSize="18sp"

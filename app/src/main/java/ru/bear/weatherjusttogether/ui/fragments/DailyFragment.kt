@@ -6,24 +6,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ru.bear.weatherjusttogether.R
 import ru.bear.weatherjusttogether.WeatherApp
-import ru.bear.weatherjusttogether.adapters.DailyAdapter
-import ru.bear.weatherjusttogether.viewmodel.ForecastViewModel
-import ru.bear.weatherjusttogether.viewmodel.ForecastViewModelFactory
+import ru.bear.weatherjusttogether.ui.adapters.DailyAdapter
+import ru.bear.weatherjusttogether.viewmodel.DailyForecastViewModel
+import ru.bear.weatherjusttogether.viewmodel.DailyForecastViewModelFactory
 import ru.bear.weatherjusttogether.viewmodel.SharedViewModel
-import ru.bear.weatherjusttogether.viewmodel.WeatherViewModel
-import ru.bear.weatherjusttogether.viewmodel.WeatherViewModelFactory
 import javax.inject.Inject
 
 class DailyFragment : Fragment() {
     @Inject
-    lateinit var viewModelFactory: ForecastViewModelFactory
-    private lateinit var viewModel: ForecastViewModel
+    lateinit var viewModelFactory: DailyForecastViewModelFactory
+    private lateinit var viewModel: DailyForecastViewModel
     private lateinit var sharedViewModel: SharedViewModel
 
     private lateinit var dailyRecyclerView: RecyclerView
@@ -59,29 +58,38 @@ class DailyFragment : Fragment() {
 
         dailyRecyclerView = view.findViewById(R.id.dailyRecyclerView)
         cityNameText = view.findViewById(R.id.city_name)
+
         dailyRecyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
 
-        // Инициализация SharedViewModel
+        // ✅ Используем адаптер один раз и передаем его в RecyclerView
+        val dailyAdapter = DailyAdapter()
+        dailyRecyclerView.adapter = dailyAdapter
+
+        // ✅ Используем SharedViewModel
         sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
-        // Наблюдаем за изменениями выбранного города
+
+        // 🔹 Наблюдаем за изменениями выбранного города
         sharedViewModel.selectedCity.observe(viewLifecycleOwner) { city ->
             city?.let {
-                // Отображаем название выбранного города
-                cityNameText.text = it
-                viewModel.fetchForecast(it)
+                cityNameText.text = it // ✅ Отображаем город
+                viewModel.fetchForecast(it) // ✅ Запрашиваем прогноз
             }
         }
 
-        viewModel.forecast.observe(viewLifecycleOwner) { forecastResponse ->
-            forecastResponse?.let {
-                val dailyList = it.forecast.forecastday
-                dailyRecyclerView.adapter = DailyAdapter(dailyList)
+        // 🔹 Подписка на LiveData для обновления списка
+        viewModel.forecast.observe(viewLifecycleOwner) { dailyList ->
+            if (dailyList != null && dailyList.isNotEmpty()) { // ✅ Проверка, если список не пуст
+                dailyAdapter.submitList(dailyList) // ✅ Используем submitList()
+            } else {
+                Toast.makeText(requireContext(), "Нет данных о прогнозе", Toast.LENGTH_SHORT).show()
             }
         }
+
 
     }
 
+
     private fun VMSettings() {
-        viewModel = ViewModelProvider(this, viewModelFactory).get(ForecastViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(DailyForecastViewModel::class.java)
     }
 }
