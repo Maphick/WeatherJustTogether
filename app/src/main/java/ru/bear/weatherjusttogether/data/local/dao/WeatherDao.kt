@@ -1,5 +1,6 @@
 package ru.bear.weatherjusttogether.data.local.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -12,32 +13,23 @@ import ru.bear.weatherjusttogether.data.local.entities.TodayWeatherDto
 
 @Dao
 interface WeatherDao {
-
-    /*** 🔹 Храним последний сохраненный город ***/
-    @Query("SELECT city FROM last_saved_city LIMIT 1")
-    fun getLastSavedCityFlow(): Flow<String?> // ✅ Теперь это Flow
-
-    @Query("SELECT city FROM last_saved_city LIMIT 1")
-    suspend fun getLastSavedCity(): String?
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveLastCity(city: LastSavedCityDto)
-
-    /*** 🔹 Методы работы с погодой ***/
+    /*** 🔹 Методы работы с текущей погодой ***/
     @Query("SELECT * FROM today_forecast WHERE city = :city LIMIT 1")
     suspend fun getWeather(city: String): TodayWeatherDto?
-
-    @Query("SELECT * FROM hourly_forecast")
-    suspend fun getHourlyForecast(): List<HourlyWeatherDto>
-
-    @Query("SELECT * FROM daily_forecast")
-    suspend fun getDailyForecast(): List<DailyWeathertDto>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWeather(weather: TodayWeatherDto)
 
+    /*** 🔹 Методы работы с почасовым прогнозом ***/
+    @Query("SELECT * FROM hourly_forecast")
+    suspend fun getHourlyForecast(): List<HourlyWeatherDto>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHourlyForecast(hourlyForecast: List<HourlyWeatherDto>)
+
+    /*** 🔹 Методы работы с дневным прогнозом ***/
+    @Query("SELECT * FROM daily_forecast")
+    suspend fun getDailyForecast(): List<DailyWeathertDto>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDailyForecast(forecast: List<DailyWeathertDto>)
@@ -52,6 +44,13 @@ interface WeatherDao {
     @Query("DELETE FROM daily_forecast")
     suspend fun deleteForecast()
 
-    @Query("DELETE FROM last_saved_city") // ✅ Очистка последнего сохраненного города
-    suspend fun deleteLastCity()
+    /*** 🔹 Методы работы с последним сохраненным городом ***/
+    @Query("SELECT city FROM last_saved_city LIMIT 1")
+    suspend fun getLastSavedCity(): String?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveLastCity(city: LastSavedCityDto)
+
+    @Query("DELETE FROM last_saved_city")
+    suspend fun clearSavedCity()
 }

@@ -12,98 +12,74 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
 import ru.bear.weatherjusttogether.data.remote.network.models.Location
 import ru.bear.weatherjusttogether.data.remote.network.models.TodayWeatherApi
 import ru.bear.weatherjusttogether.domain.models.TodayWeatherDomain
 import ru.bear.weatherjusttogether.R
-
+import kotlinx.coroutines.flow.collect
 class TodayForecastViewModel @Inject constructor(
     private val repository: WeatherRepository,
-    application: Application // Добавляем доступ к ресурсам
-) : AndroidViewModel(application) { // Наследуемся от AndroidViewModel
+    application: Application
+) : AndroidViewModel(application) {
 
     private val _weather = MutableLiveData<TodayWeatherDomain?>()
     val weather: LiveData<TodayWeatherDomain?> get() = _weather
-
 
     private val _citySuggestions = MutableLiveData<List<Location>>()
     val citySuggestions: LiveData<List<Location>> get() = _citySuggestions
 
     private val _currentCity = MutableLiveData<String>()
-    val currentCity: LiveData<String> = _currentCity.distinctUntilChanged() // Фильтруем дубли
+    val currentCity: LiveData<String> = _currentCity.distinctUntilChanged()
 
-
-    private val defaultCity = application.getString(R.string.default_city) // Получаем "Москва"
+    private val defaultCity = application.getString(R.string.default_city)
 
     init {
-        viewModelScope.launch {
-            repository.getLastSavedCityFlow()
-                .collect { lastCity ->
-                    val city = lastCity ?: defaultCity
-
-                    // Загружаем город в `currentCity`, но НЕ вызываем `fetchWeather()`
-                    if (_currentCity.value.isNullOrEmpty()) {
-                        _currentCity.postValue(city)
-                    }
-                }
-        }
-    }
-
-
-
-
-
-
-    suspend fun getSavedCity(): String? {
-        return repository.getLastSavedCity() // Теперь `Fragment` не обращается к `Repository` напрямую
-    }
-
-    fun saveCityToRoom(city: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.saveLastCity(city)
+            val lastCity = repository.getLastSavedCity() ?: defaultCity
             withContext(Dispatchers.Main) {
-                _currentCity.value = city  // Обновляем LiveData
+                _currentCity.value = lastCity
+                fetchWeather(lastCity)
             }
         }
     }
 
 
+    suspend fun getSavedCity(): String? {
+        return repository.getLastSavedCity()
+    }
+
+    fun saveCityToRoom(city: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (_currentCity.value == city) return@launch
+            repository.saveLastCity(city)
+            withContext(Dispatchers.Main) {
+                _currentCity.value = city
+                fetchWeather(city) // После сохранения сразу обновляем погоду
+            }
+        }
+    }
+
     fun fetchWeather(city: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (_currentCity.value == city) return@launch // Предотвращаем повторные запросы
-            if (_weather.value != null && _currentCity.value == city) return@launch // Если погода уже есть, не запрашиваем повторно
-
             try {
                 val response = repository.getWeather(city)
                 withContext(Dispatchers.Main) {
                     if (_weather.value != response) {
-                        _weather.value = response
-                        if (_currentCity.value != city) { // Проверяем перед обновлением
-                            _currentCity.postValue(city)
-                        }
+                        _weather.postValue(response) // Устанавливаем новые данные
+                    }
+                    if (_currentCity.value != city) {
+                        _currentCity.value = city
                     }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
-                    _weather.value = null
+                    _weather.postValue(null) // Сброс предыдущих данных
                 }
             }
         }
     }
-
-
-
-
-
 
     fun fetchCitySuggestions(city: String, callback: (List<Location>) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {

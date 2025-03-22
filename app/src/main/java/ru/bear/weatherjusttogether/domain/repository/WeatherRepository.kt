@@ -11,14 +11,16 @@ import ru.bear.weatherjusttogether.domain.models.TodayWeatherDomain
 // В ViewModel используем viewModelScope.launch
 // В Fragment подписываемся на LiveData
 interface WeatherRepository {
-
-    suspend fun saveLastCity(city: String)
+    /**
+     * Получение последнего сохраненного города
+     */
     suspend fun getLastSavedCity(): String?
 
     /**
-     * Получение последнего кешированного города, если интернет не доступен
+     * Сохранение последнего города в локальное хранилище
      */
-    fun getLastSavedCityFlow(): Flow<String?>
+    suspend fun saveLastCity(city: String)
+
     /**
      * Получение текущей погоды.
      * Если интернет доступен, загружаем из API и кешируем в Room.
@@ -26,7 +28,6 @@ interface WeatherRepository {
      */
     suspend fun getWeather(city: String): TodayWeatherDomain?
 
-    //suspend fun clearWeather(city: String)
     /**
      * Очистка кэша погоды для города.
      */
