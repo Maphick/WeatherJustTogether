@@ -16,8 +16,8 @@ import ru.bear.weatherjusttogether.data.repository.WeatherRepositoryImpl
 import ru.bear.weatherjusttogether.data.remote.network.api.WeatherApi
 import ru.bear.weatherjusttogether.utils.LoggingInterceptor
 import ru.bear.weatherjusttogether.viewmodel.DailyForecastViewModelFactory
+import ru.bear.weatherjusttogether.viewmodel.DetailedWeatherViewModelFactory
 import ru.bear.weatherjusttogether.viewmodel.HourlyForecastViewModelFactory
-import ru.bear.weatherjusttogether.viewmodel.SharedViewModel
 import ru.bear.weatherjusttogether.viewmodel.TodayForecastViewModelFactory
 import javax.inject.Singleton
 
@@ -28,12 +28,14 @@ object AppModule {
 
     private const val BASE_URL = "https://api.weatherapi.com/"
 
+    /*** 🔹 Предоставляем контекст приложения ***/
     @Provides
     @Singleton
     fun provideApplication(context: Context): Application {
         return context.applicationContext as Application
     }
 
+    /*** 🔹 Настройка OkHttp с логированием ***/
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
@@ -41,10 +43,11 @@ object AppModule {
         logging.setLevel(HttpLoggingInterceptor.Level.BODY)
         return OkHttpClient.Builder()
             .addInterceptor(logging)
-            .addInterceptor(LoggingInterceptor())  // Добавляем свой Interceptor
+            .addInterceptor(LoggingInterceptor()) // Кастомный Interceptor (если есть)
             .build()
     }
 
+    /*** 🔹 Настройка Retrofit ***/
     @Provides
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
@@ -55,14 +58,14 @@ object AppModule {
             .build()
     }
 
+    /*** 🔹 Предоставление API-интерфейса ***/
     @Provides
     @Singleton
     fun provideWeatherApi(retrofit: Retrofit): WeatherApi {
         return retrofit.create(WeatherApi::class.java)
     }
 
-
-    /*** 🔹 Подключаем Room ***/
+    /*** 🔹 Настройка базы данных Room ***/
     @Provides
     @Singleton
     fun provideDatabase(context: Context): WeatherDatabase {
@@ -74,14 +77,13 @@ object AppModule {
             .build()
     }
 
-
-    //  Используем единый WeatherDao вместо нескольких
+    /*** 🔹 Получение DAO ***/
     @Provides
     fun provideWeatherDao(database: WeatherDatabase): WeatherDao {
         return database.weatherDao()
     }
 
-    /*** 🔹 Подключаем WeatherRepository в Dagger ***/
+    /*** 🔹 Репозиторий ***/
     @Provides
     @Singleton
     fun provideWeatherRepository(
@@ -91,29 +93,35 @@ object AppModule {
         return WeatherRepositoryImpl(api, weatherDao)
     }
 
+    /*** 🔹 Фабрики ViewModel ***/
     @Provides
     @Singleton
-    fun provideWeatherViewModelFactory(
+    fun provideTodayForecastViewModelFactory(
         repository: WeatherRepository,
         application: Application
     ): TodayForecastViewModelFactory {
         return TodayForecastViewModelFactory(repository, application)
     }
+
+
     @Provides
     @Singleton
-    fun provideForecastViewModelFactory(repository: WeatherRepository): DailyForecastViewModelFactory {
+    fun provideDailyForecastViewModelFactory(repository: WeatherRepository): DailyForecastViewModelFactory {
         return DailyForecastViewModelFactory(repository)
     }
 
     @Provides
     @Singleton
-    fun provideHourlyViewModelFactory(repository: WeatherRepository): HourlyForecastViewModelFactory {
+    fun provideHourlyForecastViewModelFactory(repository: WeatherRepository): HourlyForecastViewModelFactory {
         return HourlyForecastViewModelFactory(repository)
     }
 
     @Provides
     @Singleton
-    fun provideSharedViewModel(): SharedViewModel {
-        return SharedViewModel()
+    fun provideDetailedWeatherViewModelFactory(
+        repository: WeatherRepository,
+        application: Application
+    ): DetailedWeatherViewModelFactory {
+        return DetailedWeatherViewModelFactory(repository, application)
     }
 }

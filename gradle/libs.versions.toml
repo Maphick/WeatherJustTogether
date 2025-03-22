@@ -1,5 +1,5 @@
 [versions]
-agp = "8.8.2"
+agp = "8.9.0"
 kotlin = "1.9.24"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -19,6 +19,7 @@ okhttp = "4.10.0"
 coil = "2.0.0"
 glide = "4.16.0"
 room = "2.6.1"
+firebaseInappmessaging = "21.0.1"
 
 
 
@@ -55,6 +56,7 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 
 #LIFECYCLE
 lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
+firebase-inappmessaging = { group = "com.google.firebase", name = "firebase-inappmessaging", version.ref = "firebaseInappmessaging" }
 
 
 

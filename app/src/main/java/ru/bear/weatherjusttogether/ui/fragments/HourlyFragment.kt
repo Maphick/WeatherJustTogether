@@ -19,14 +19,12 @@ import ru.bear.weatherjusttogether.WeatherApp
 import ru.bear.weatherjusttogether.ui.adapters.HourlyAdapter
 import ru.bear.weatherjusttogether.viewmodel.HourlyForecastViewModel
 import ru.bear.weatherjusttogether.viewmodel.HourlyForecastViewModelFactory
-import ru.bear.weatherjusttogether.viewmodel.SharedViewModel
 import javax.inject.Inject
 
 class HourlyFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory: HourlyForecastViewModelFactory
     private lateinit var viewModel: HourlyForecastViewModel
-    private lateinit var sharedViewModel: SharedViewModel
 
     private lateinit var hourlyRecyclerView: RecyclerView
     private lateinit var cityNameText: TextView
@@ -35,9 +33,6 @@ class HourlyFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as WeatherApp).appComponent.inject(this)
-
-        // Инициализация SharedViewModel
-        sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,13 +60,6 @@ class HourlyFragment : Fragment() {
         val hourlyAdapter = HourlyAdapter()
         hourlyRecyclerView.adapter = hourlyAdapter
 
-        // Наблюдаем за изменениями выбранного города
-        sharedViewModel.selectedCity.observe(viewLifecycleOwner) { city ->
-            city?.let {
-                cityNameText.text = it
-                viewModel.updateCity(it) // ✅ Теперь просто обновляем город
-            }
-        }
 
         // Подписываемся на LiveData
         viewModel.hourlyForecast.observe(viewLifecycleOwner) { hourlyData ->

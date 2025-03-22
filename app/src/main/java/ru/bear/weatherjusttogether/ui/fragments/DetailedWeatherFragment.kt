@@ -2,27 +2,25 @@ package ru.bear.weatherjusttogether.ui.fragments
 
 import android.content.Context
 import android.graphics.Color
-import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.ListView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +28,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.bear.weatherjusttogether.R
 import ru.bear.weatherjusttogether.WeatherApp
-import ru.bear.weatherjusttogether.data.remote.network.models.Location
 import ru.bear.weatherjusttogether.domain.models.HourlyWeatherDomain
 import ru.bear.weatherjusttogether.domain.models.TodayWeatherDomain
 import ru.bear.weatherjusttogether.viewmodel.HourlyForecastViewModel
@@ -39,8 +36,7 @@ import ru.bear.weatherjusttogether.viewmodel.TodayForecastViewModel
 import ru.bear.weatherjusttogether.viewmodel.TodayForecastViewModelFactory
 import javax.inject.Inject
 
-/*
-class HomeFragment : Fragment() {
+class DetailedWeatherFragment : Fragment() {
     @Inject
     lateinit var todayForecastViewModelFactory: TodayForecastViewModelFactory
     private lateinit var todayForecastViewModel: TodayForecastViewModel
@@ -49,10 +45,18 @@ class HomeFragment : Fragment() {
     lateinit var hourlyМiewModelFactory: HourlyForecastViewModelFactory
     private lateinit var hourlyForecastViewModel: HourlyForecastViewModel
 
-    lateinit var searchInput: EditText
-    lateinit var searchButton: Button
-    lateinit var suggestionsList: ListView
+
     lateinit var cityNameText: TextView
+    //lateinit var conditionText: TextView
+    //lateinit var temperatureText: TextView
+    //lateinit var weatherIcon: ImageView
+    lateinit var humidityText: TextView
+    lateinit var windText: TextView
+    lateinit var pressureText: TextView
+    lateinit var uvText: TextView
+    lateinit var visibilityText: TextView
+    lateinit var feelsLikeText: TextView
+    lateinit var precipitationText: TextView
 
 
     override fun onAttach(context: Context) {
@@ -61,11 +65,9 @@ class HomeFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        return inflater.inflate(R.layout.fragment_detailed_weather, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -95,95 +97,56 @@ class HomeFragment : Fragment() {
                 .commit()
         }
 
-        searchInput = view.findViewById<EditText>(R.id.search_input)
-        searchButton = view.findViewById<Button>(R.id.btnSearch)
-        suggestionsList = view.findViewById<ListView>(R.id.suggestions_list)
-        cityNameText = view.findViewById<TextView>(R.id.city_name)
-
-
-        searchButtonSettings()
         saveCity()
-    }
 
-    private fun searchButtonSettings() {
-        searchButton.background = null
+        cityNameText = view.findViewById(R.id.city_name)
+        //conditionText= view.findViewById(R.id.condition_text)
+        //temperatureText = view.findViewById(R.id.temperature_value)
+        //weatherIcon = view.findViewById(R.id.weather_icon)
+        humidityText = view.findViewById(R.id.humidity_value)
+        windText = view.findViewById(R.id.wind_value)
+        pressureText = view.findViewById(R.id.pressure_value)
+        uvText = view.findViewById(R.id.uv_value)
+        visibilityText = view.findViewById(R.id.visibility_value)
+        feelsLikeText = view.findViewById(R.id.feels_like_value)
+        precipitationText = view.findViewById(R.id.precipitation_value)
+        //val btnBack: ImageButton = view.findViewById(R.id.btnBack)
 
-        searchButton.setOnClickListener {
-            val query = searchInput.text.toString().trim()
-            if (query.isNotEmpty()) {
-                todayForecastViewModel.fetchCitySuggestions(query) { locations ->
-                    val adapter = object : ArrayAdapter<Location>(
-                        requireContext(),
-                        R.layout.custom_list_item,
-                        locations
-                    ) {
-                        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                            val view = convertView ?: LayoutInflater.from(context)
-                                .inflate(R.layout.custom_list_item, parent, false)
+        val btnBack: ImageButton = view.findViewById(R.id.btnBack)
+        btnBack.setOnClickListener {
+            requireActivity().supportFragmentManager.popBackStack()
+        }
 
-                            val cityName = view.findViewById<TextView>(R.id.city_name)
-                            val cityRegion = view.findViewById<TextView>(R.id.city_region_country)
-                            val location = getItem(position)
 
-                            location?.let {
-                                cityName.text = it.name
-                                cityRegion.text = "${it.region}, ${it.country}"
-                            }
+        todayForecastViewModel = ViewModelProvider(this, todayForecastViewModelFactory)
+            .get(TodayForecastViewModel::class.java)
 
-                            return view
-                        }
-                    }
+        todayForecastViewModel.weather.observe(viewLifecycleOwner) { weather ->
+            weather?.let {
+                cityNameText.text = "${it.city}, ${it.region}, ${it.country}"
+                //conditionText.text = it.conditionText
+                //temperatureText.text = "${it.temp_c}°C"
+                humidityText.text = "${it.humidity}%"
+                windText.text = "${it.wind_kph} км/ч, ${it.wind_dir}"
+                pressureText.text = "${it.pressure_mb} hPa"
+                uvText.text = "${it.uv}"
+                visibilityText.text = "${it.vis_km} км"
+                feelsLikeText.text = "${it.feelslike_c}°C"
+                precipitationText.text = "${it.precip_mm} мм"
 
-                    suggestionsList.adapter = adapter
-                    suggestionsList.visibility = View.VISIBLE
-
-                    suggestionsList.setOnItemClickListener { _, _, position, _ ->
-                        val selectedCity = locations[position]
-
-                        lifecycleScope.launch {
-                            // Сохранится в базе
-                            todayForecastViewModel.saveCityToRoom(selectedCity.name)
-                        }
-
-                        searchInput.setText(selectedCity.name)
-                        cityNameText.text = "${selectedCity.name}, ${selectedCity.region}, ${selectedCity.country}"
-                        suggestionsList.visibility = View.GONE
-                    }
-
-                }
+                //Glide.with(this).load("https:${it.conditionIcon}").into(weatherIcon)
             }
         }
+
+        /*btnBack.setOnClickListener {
+            requireActivity().supportFragmentManager.popBackStack()
+        }*/
     }
 
-    private fun saveCity() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            todayForecastViewModel.getSavedCity()?.let { lastCity ->
-                withContext(Dispatchers.Main) {
-                    // Не обновляем, если город уже установлен
-                    if (!lastCity.isNullOrEmpty() && lastCity != todayForecastViewModel.currentCity.value) {
-                        cityNameText.text = lastCity
+    private fun Init()
+    {
 
-                        todayForecastViewModel.fetchWeather(lastCity)
-                        hourlyForecastViewModel.fetchHourlyForecast(lastCity)
-                    }
-                }
-            }
-        }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     private fun VMSettings() {
         todayForecastViewModel = ViewModelProvider(this, todayForecastViewModelFactory).get(TodayForecastViewModel::class.java)
@@ -206,18 +169,8 @@ class HomeFragment : Fragment() {
         }
     }
 
-
     private fun updateUI(weather: TodayWeatherDomain) {
         view?.let {
-            val searchInput: EditText = it.findViewById(R.id.search_input)
-            val cityNameText: TextView = it.findViewById(R.id.city_name)
-            val windText: TextView = it.findViewById(R.id.wind_value)
-            val humidityText: TextView = it.findViewById(R.id.humidity_value)
-            val pressureText: TextView = it.findViewById(R.id.pressure_value)
-            val temperatureText: TextView = it.findViewById(R.id.temperature_value)
-            val weatherIcon: ImageView = it.findViewById(R.id.weather_icon)
-            val conditionText: TextView = it.findViewById(R.id.condition_text)
-
             // Обновляем UI с помощью данных из доменной модели
             //  только изменённые данные обновляют UI
             if (cityNameText.text.toString() != "${weather.city}, ${weather.region}, ${weather.country}") {
@@ -232,7 +185,7 @@ class HomeFragment : Fragment() {
             if (pressureText.text.toString() != "${weather.pressure_mb} hPa") {
                 pressureText.text = "${weather.pressure_mb} hPa"
             }
-            if (temperatureText.text.toString() != "${weather.temp_c}°C") {
+            /*if (temperatureText.text.toString() != "${weather.temp_c}°C") {
                 temperatureText.text = "${weather.temp_c}°C"
             }
             if (conditionText.text.toString() != weather.conditionText) {
@@ -244,20 +197,31 @@ class HomeFragment : Fragment() {
                 Glide.with(this)
                     .load("https:${weather.conditionIcon}")
                     .into(weatherIcon)
-                weatherIcon.tag = weather.conditionIcon // ✅ Запоминаем текущий URL иконки
+                weatherIcon.tag = weather.conditionIcon //
             }
-
-            // Загружаем иконку погоды с помощью Glide
-            if (!weather.conditionIcon.isNullOrEmpty()) {
-                Glide.with(this)
-                    .load("https:${weather.conditionIcon}")
-                    .into(weatherIcon)
-            } else {
-                Log.e("Glide", "Иконка погоды отсутствует")
-            }
+         */
 
         }
     }
+
+
+    private fun saveCity() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            todayForecastViewModel.getSavedCity()?.let { lastCity ->
+                withContext(Dispatchers.Main) {
+                    // Не обновляем, если город уже установлен
+                    if (!lastCity.isNullOrEmpty() && lastCity != todayForecastViewModel.currentCity.value) {
+                        cityNameText.text = lastCity
+
+                        todayForecastViewModel.fetchWeather(lastCity)
+                        hourlyForecastViewModel.fetchHourlyForecast(lastCity)
+                    }
+                }
+            }
+        }
+    }
+
+
 
 
     private fun updateChart(hourlyData: List<HourlyWeatherDomain>) {
@@ -362,6 +326,4 @@ class HomeFragment : Fragment() {
             axisRight.isEnabled = false // Отключаем правую ось
         }
     }
-
 }
-*/

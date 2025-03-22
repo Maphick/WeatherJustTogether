@@ -86,7 +86,7 @@ class SplashFragment : Fragment() {
         // Переход на HomeFragment через 4 секунды
         Handler(Looper.getMainLooper()).postDelayed({
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, HomeFragment())
+                .replace(R.id.fragmentContainer, TodayWeatherFragment())
                 .commit()
 
             // Показываем нижнюю панель навигации

@@ -1,6 +1,7 @@
 package ru.bear.weatherjusttogether.data.repository
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -25,23 +26,16 @@ class WeatherRepositoryImpl @Inject constructor(
     private val weatherDao: WeatherDao
 ) : WeatherRepository {
 
+
     override suspend fun saveLastCity(city: String) {
-        weatherDao.saveLastCity(LastSavedCityDto(city))
+        weatherDao.clearSavedCity() // Удаляем предыдущие записи
+        weatherDao.saveLastCity(LastSavedCityDto(city)) // Сохраняем новый город
     }
+
 
     override suspend fun getLastSavedCity(): String? {
         return weatherDao.getLastSavedCity()
     }
-
-
-    /**
-     * Получение последнего сохраненного города как `Flow`.
-     * Теперь поток обновляется автоматически.
-     */
-    override fun getLastSavedCityFlow(): Flow<String?> =
-        weatherDao.getLastSavedCityFlow()
-            .flowOn(Dispatchers.IO)
-            .catch { e -> Log.e("WeatherRepository", "Error fetching last city: ${e.message}") }
 
     /**
      *  Получение текущей погоды.
@@ -50,12 +44,12 @@ class WeatherRepositoryImpl @Inject constructor(
      */
     override suspend fun getWeather(city: String): TodayWeatherDomain? {
         return try {
-            val weatherResponse = weatherApi.getCurrentWeather(API_KEY, city, "ru")
-            val todayWeather = TodayWeathertMapper.mapApiToDomain(weatherResponse)
+            val weatherResponse = weatherApi.getCurrentWeather(API_KEY, city, "ru") ?: return null
+            val todayWeather = TodayWeathertMapper.mapApiToDomain(weatherResponse) ?: return null
 
             // Сохраняем в Room
             weatherDao.insertWeather(TodayWeathertMapper.mapDomainToDto(todayWeather))
-            saveLastCity(city) // ✅ Сохраняем город в Room только здесь
+            saveLastCity(city) // Сохраняем город в Room только здесь
 
             todayWeather
         } catch (e: Exception) {

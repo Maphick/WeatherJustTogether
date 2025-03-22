@@ -10,9 +10,9 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import ru.bear.weatherjusttogether.ui.fragments.AlertsFragment
 import ru.bear.weatherjusttogether.ui.fragments.DailyFragment
-import ru.bear.weatherjusttogether.ui.fragments.HomeFragment
 import ru.bear.weatherjusttogether.ui.fragments.HourlyFragment
 import ru.bear.weatherjusttogether.ui.fragments.SplashFragment
+import ru.bear.weatherjusttogether.ui.fragments.TodayWeatherFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         bottomNav.setOnItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_home -> {
-                    openFragment(HomeFragment())
+                    openFragment(TodayWeatherFragment())
                     true
                 }
                 R.id.nav_hourly -> {
@@ -64,11 +64,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Когда переходим на Home после Splash:
-    fun goToHome() {
+    /*fun goToHome() {
         bottomNav.visibility = View.VISIBLE
         openFragment(HomeFragment())
         bottomNav.selectedItemId = R.id.nav_home
     }
+    */
 
     private fun openFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()

@@ -16,14 +16,12 @@ import ru.bear.weatherjusttogether.WeatherApp
 import ru.bear.weatherjusttogether.ui.adapters.DailyAdapter
 import ru.bear.weatherjusttogether.viewmodel.DailyForecastViewModel
 import ru.bear.weatherjusttogether.viewmodel.DailyForecastViewModelFactory
-import ru.bear.weatherjusttogether.viewmodel.SharedViewModel
 import javax.inject.Inject
 
 class DailyFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory: DailyForecastViewModelFactory
     private lateinit var viewModel: DailyForecastViewModel
-    private lateinit var sharedViewModel: SharedViewModel
 
     private lateinit var dailyRecyclerView: RecyclerView
 
@@ -33,10 +31,6 @@ class DailyFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as WeatherApp).appComponent.inject(this)
-
-        // Инициализируем sharedViewModel
-        sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,16 +59,6 @@ class DailyFragment : Fragment() {
         val dailyAdapter = DailyAdapter()
         dailyRecyclerView.adapter = dailyAdapter
 
-        // ✅ Используем SharedViewModel
-        sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
-
-        // 🔹 Наблюдаем за изменениями выбранного города
-        sharedViewModel.selectedCity.observe(viewLifecycleOwner) { city ->
-            city?.let {
-                cityNameText.text = it // ✅ Отображаем город
-                viewModel.fetchForecast(it) // ✅ Запрашиваем прогноз
-            }
-        }
 
         // 🔹 Подписка на LiveData для обновления списка
         viewModel.forecast.observe(viewLifecycleOwner) { dailyList ->
