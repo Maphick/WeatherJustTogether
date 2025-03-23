@@ -27,10 +27,8 @@ class TodayForecastViewModel @Inject constructor(
     val weather: LiveData<TodayWeatherDomain?> get() = _weather
 
     private val _citySuggestions = MutableLiveData<List<Location>>()
-    val citySuggestions: LiveData<List<Location>> get() = _citySuggestions
 
     private val _currentCity = MutableLiveData<String>()
-    val currentCity: LiveData<String> = _currentCity.distinctUntilChanged()
 
     private val defaultCity = application.getString(R.string.default_city)
 
@@ -42,11 +40,6 @@ class TodayForecastViewModel @Inject constructor(
                 fetchWeather(lastCity)
             }
         }
-    }
-
-
-    suspend fun getSavedCity(): String? {
-        return repository.getLastSavedCity()
     }
 
     fun saveCityToRoom(city: String) {

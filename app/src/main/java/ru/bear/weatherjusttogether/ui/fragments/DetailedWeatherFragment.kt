@@ -104,6 +104,7 @@ class DetailedWeatherFragment : Fragment() {
     }
 
 
+    // настройка вью-модели
     private fun VMSettings() {
         todayForecastViewModel = ViewModelProvider(this, todayForecastViewModelFactory)
             .get(TodayForecastViewModel::class.java)

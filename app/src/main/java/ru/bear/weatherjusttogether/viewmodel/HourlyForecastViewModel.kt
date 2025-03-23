@@ -23,11 +23,6 @@ class HourlyForecastViewModel @Inject constructor(
     private val _cityName = MutableLiveData<String>()
     val cityName: LiveData<String> get() = _cityName
 
-    /** Метод для обновления прогноза по новому городу */
-    fun updateCity(city: String) {
-        fetchHourlyForecast(city)
-    }
-
     private fun fetchHourlyForecast(city: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {

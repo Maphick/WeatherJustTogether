@@ -21,10 +21,8 @@ class DetailedWeatherViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     private val _weatherDetails = MutableLiveData<TodayWeatherDomain?>()
-    val weatherDetails: LiveData<TodayWeatherDomain?> get() = _weatherDetails
 
     private val _currentCity = MutableLiveData<String>()
-    val currentCity: LiveData<String> = _currentCity.distinctUntilChanged()
 
     private val defaultCity = application.getString(R.string.default_city)
 
