@@ -1,5 +1,40 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+        <!-- Яркие розовые оттенки -->
+        <color name="bright_pink_light">#FF69B4</color> <!-- Яркий розовый -->
+        <color name="bright_pink_medium">#FF1493</color> <!-- Глубокий розовый -->
+        <color name="bright_pink_dark">#C71585</color> <!-- Темный розовый -->
+
+        <!-- Яркие фиолетовые оттенки -->
+        <color name="bright_purple_light">#9370DB</color> <!-- Лаванда -->
+        <color name="bright_purple_medium">#8A2BE2</color> <!-- Синий фиолетовый -->
+        <color name="bright_purple_dark">#4B0082</color> <!-- Индиго -->
+
+        <!-- Градиентные оттенки -->
+        <color name="gradient_start">#FF6EC7</color> <!-- Яркий розовый градиент -->
+        <color name="gradient_end">#6A0DAD</color> <!-- Яркий фиолетовый градиент -->
+
+        <!-- Контрастные оттенки для текста -->
+        <color name="text_bright">#FFFFFF</color> <!-- Белый текст -->
+        <color name="text_dark">#000000</color> <!-- Черный текст -->
+
+        <!-- Соднце-->
+        <color name="sun">#FFEB3B</color> <!-- Желтый текст -->
+        <color name="bright_yellow">#FFD700</color> <!-- Яркий золотисто-жёлтый -->
+
+        <!-- Навигация-->
+        <color name="white">#FFFFFF</color>
+
+        <color name="weather_icon_color">#FF6EC7</color> <!-- для иконок -->
+
+
+        <color name="sunny_color">#FFD700</color> <!-- Ярко-желтый -->
+        <color name="cloudy_color">#949393</color> <!-- Серый -->
+        <color name="snow_color">#D5D4D4</color> <!-- Белый -->
+        <color name="rainy_color">#2196F3</color> <!-- Синий -->
+        <color name="gray">#808080</color>
+        <color name="dark_blue">#1A237E</color>
+        <color name="light_gray">#D3D3D3</color>
+
+
+
 </resources>

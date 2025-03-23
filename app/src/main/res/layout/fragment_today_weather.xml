@@ -1,0 +1,235 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bright_purple_light"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Фоновое изображение -->
+    <ImageView
+        android:id="@+id/weather_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:alpha="0.5"
+        android:src="@drawable/cloudly" />
+
+    <!-- Верхняя панель -->
+    <RelativeLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:elevation="0dp">
+
+
+        <!-- Заголовок -->
+        <TextView
+            android:id="@+id/page_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Прогноз на сегодня"
+            android:textSize="42sp"
+            android:textColor="@color/text_bright"
+            android:fontFamily="@font/greatvibesregular"
+            android:textStyle="bold"
+            android:shadowColor="#80000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="3" />
+
+        <!-- Кнопка Настройки -->
+        <FrameLayout
+            android:id="@+id/settings_button_container"
+            android:layout_width="50dp"
+            android:layout_height="100dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignBottom="@id/page_name"
+            android:elevation="8dp">
+
+            <ImageButton
+                android:id="@+id/btnSettings"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:src="@drawable/settings"
+                android:contentDescription="Настройки"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                android:padding="8dp" />
+        </FrameLayout>
+    </RelativeLayout>
+
+    <!-- Панель поиска -->
+    <RelativeLayout
+        android:id="@+id/search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_below="@id/top_bar"
+        android:elevation="6dp">
+
+        <EditText
+            android:id="@+id/search_input"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:hint="Введите город"
+            android:background="@drawable/search_background"
+            android:paddingStart="8dp"
+            android:paddingTop="8dp"
+            android:textColor="@color/bright_purple_medium"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/greatvibesregular"/>
+
+        <Button
+            android:id="@+id/btnSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/search_input"
+            android:text="🔍"
+            android:textSize="28.dp"
+            android:background="@android:color/transparent"
+            android:textColor="@color/white"/>
+    </RelativeLayout>
+
+    <!-- Список предложенных городов (выпадающий список) -->
+    <ListView
+        android:id="@+id/suggestions_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_bar"
+        android:background="@drawable/rounded_transparent_bg"
+        android:visibility="gone"
+        android:elevation="8dp"
+        android:layout_marginTop="-8dp"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="10dp"
+        android:padding="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"/>
+    <LinearLayout
+        android:id="@+id/city_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:layout_below="@id/search_bar"
+        >
+        <!-- Название города -->
+        <TextView
+            android:id="@+id/city_name"
+            android:layout_margin="0.dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="34sp"
+            android:textColor="@color/bright_purple_dark"
+            android:fontFamily="@font/greatvibesregular"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+
+    <!-- Основная информация о погоде -->
+    <LinearLayout
+        android:id="@+id/weather_info_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_below="@id/city_info"
+        android:layout_marginTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <!-- Иконка погоды (СЛЕВА) -->
+        <ImageView
+            android:id="@+id/weather_icon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_sunny"
+            android:layout_gravity="center_vertical"
+            app:tint="@android:color/holo_orange_dark" />
+
+        <!-- Температура и состояние погоды -->
+        <LinearLayout
+            android:id="@+id/weather_info"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="start"
+            android:layout_marginStart="16dp">
+
+            <TextView
+                android:id="@+id/temperature_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="7°C"
+                android:textSize="44sp"
+                android:textColor="@color/bright_pink_medium"
+                android:fontFamily="@font/greatvibesregular"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/condition_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mist"
+                android:textSize="20sp"
+                android:textColor="@color/text_bright"
+                android:fontFamily="@font/greatvibesregular"
+                android:layout_marginTop="5dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Кнопка "Поделиться" слева -->
+    <FrameLayout
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="24dp"
+
+        android:elevation="8dp">
+
+        <ImageButton
+            android:id="@+id/btnShare"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:src="@drawable/share"
+            android:contentDescription="Поделиться"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:padding="8dp" />
+    </FrameLayout>
+
+
+    <!-- Кнопка "Подробнее" справа -->
+    <FrameLayout
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:elevation="8dp">
+
+        <ImageButton
+            android:id="@+id/btnDetails"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:src="@drawable/read_more"
+            android:contentDescription="Подробнее"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:padding="8dp" />
+    </FrameLayout>
+
+
+</RelativeLayout>
