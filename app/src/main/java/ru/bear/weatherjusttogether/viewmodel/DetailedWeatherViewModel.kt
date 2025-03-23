@@ -47,19 +47,6 @@ class DetailedWeatherViewModel @Inject constructor(
                         _currentCity.value = city
                     } ?: Log.e("fetchWeather", "Ошибка: Данные погоды null для города $city")
                 }
-
-
-                /*
-                val response = repository.getWeather(city)
-                withContext(Dispatchers.Main) {
-                    if (_weatherDetails.value != response) {
-                        _weatherDetails.value = response
-                    }
-                    if (_currentCity.value != city) {
-                        _currentCity.value = city
-                    }
-                }
-                */
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {

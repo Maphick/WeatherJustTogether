@@ -15,6 +15,9 @@ import javax.inject.Inject
 class DailyForecastViewModel @Inject constructor(
     private val repository: WeatherRepository
 ) : ViewModel() {
+    private val _cityName = MutableLiveData<String>()
+    val cityName: LiveData<String> get() = _cityName
+
 
     private val _forecast = MutableLiveData<List<DailyWeatherDomain>>()
     val forecast: LiveData<List<DailyWeatherDomain>> get() = _forecast
@@ -34,4 +37,26 @@ class DailyForecastViewModel @Inject constructor(
             }
         }
     }
+
+    fun fetchForecastWithFallback(cityArg: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val city = cityArg ?: repository.getLastSavedCity() ?: "Москва"
+                val response = repository.getDailyForecast(city)
+
+                withContext(Dispatchers.Main) {
+                    _forecast.value = response
+                    _cityName.value = city // <–– обновляем название города
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    _forecast.value = emptyList()
+                    _cityName.value = cityArg ?: "Неизвестно"
+                }
+            }
+        }
+    }
+
+
 }

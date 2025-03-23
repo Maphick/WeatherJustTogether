@@ -63,13 +63,6 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-    // Когда переходим на Home после Splash:
-    /*fun goToHome() {
-        bottomNav.visibility = View.VISIBLE
-        openFragment(HomeFragment())
-        bottomNav.selectedItemId = R.id.nav_home
-    }
-    */
 
     private fun openFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()

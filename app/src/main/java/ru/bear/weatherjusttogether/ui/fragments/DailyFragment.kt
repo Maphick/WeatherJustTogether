@@ -48,32 +48,41 @@ class DailyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        VMSettings()
-
         dailyRecyclerView = view.findViewById(R.id.dailyRecyclerView)
         cityNameText = view.findViewById(R.id.city_name)
-
         dailyRecyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
 
-        // ✅ Используем адаптер один раз и передаем его в RecyclerView
+        // Используем адаптер один раз и передаем его в RecyclerView
         val dailyAdapter = DailyAdapter()
         dailyRecyclerView.adapter = dailyAdapter
 
+        VMSettings(dailyAdapter)
 
-        // 🔹 Подписка на LiveData для обновления списка
-        viewModel.forecast.observe(viewLifecycleOwner) { dailyList ->
-            if (dailyList != null && dailyList.isNotEmpty()) { // ✅ Проверка, если список не пуст
-                dailyAdapter.submitList(dailyList) // ✅ Используем submitList()
-            } else {
-                Toast.makeText(requireContext(), "Нет данных о прогнозе", Toast.LENGTH_SHORT).show()
-            }
-        }
 
 
     }
 
 
-    private fun VMSettings() {
-        viewModel = ViewModelProvider(this, viewModelFactory).get(DailyForecastViewModel::class.java)
+    private fun VMSettings(dailyAdapter: DailyAdapter) {
+        viewModel = ViewModelProvider(this, viewModelFactory)
+            .get(DailyForecastViewModel::class.java)
+
+        // Подписка на LiveData для обновления списка
+        viewModel.forecast.observe(viewLifecycleOwner) { dailyList ->
+            if (dailyList != null && dailyList.isNotEmpty()) { // Проверка, если список не пуст
+                dailyAdapter.submitList(dailyList) // Используем submitList()
+            } else {
+                Toast.makeText(requireContext(), "Нет данных о прогнозе", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // подписка на изменение названия города
+        viewModel.cityName.observe(viewLifecycleOwner) { city ->
+            cityNameText.text = city
+        }
+
+        // Запуск загрузки
+        viewModel.fetchForecastWithFallback(selectedCity)
+
     }
 }

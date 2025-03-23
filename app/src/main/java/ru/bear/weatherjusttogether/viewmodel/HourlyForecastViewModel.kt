@@ -20,25 +20,37 @@ class HourlyForecastViewModel @Inject constructor(
     private val _hourlyForecast = MutableLiveData<List<HourlyWeatherDomain>?>()
     val hourlyForecast: LiveData<List<HourlyWeatherDomain>?> get() = _hourlyForecast
 
+    private val _cityName = MutableLiveData<String>()
+    val cityName: LiveData<String> get() = _cityName
+
     /** Метод для обновления прогноза по новому городу */
     fun updateCity(city: String) {
         fetchHourlyForecast(city)
     }
 
-
-    fun fetchHourlyForecast(city: String) {
+    private fun fetchHourlyForecast(city: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val hourlyData = repository.getHourlyForecast(city) // Теперь используем доменную модель
+                val hourlyData = repository.getHourlyForecast(city)
                 withContext(Dispatchers.Main) {
                     _hourlyForecast.value = hourlyData
+                    _cityName.value = city
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
                     _hourlyForecast.value = null
+                    _cityName.value = city
                 }
             }
+        }
+    }
+
+    /** Загружаем прогноз, определяя город из аргумента или из Room */
+    fun fetchForecastWithFallback(cityArg: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val city = cityArg ?: repository.getLastSavedCity() ?: "Москва"
+            fetchHourlyForecast(city)
         }
     }
 }

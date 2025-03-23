@@ -18,29 +18,46 @@
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:elevation="6dp">
+        android:padding="8dp"
+        android:elevation="0dp">
 
+
+        <!-- Заголовок -->
         <TextView
             android:id="@+id/page_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:text="Прогноз на сегодня"
-            android:textSize="40sp"
-            android:textColor="@color/bright_pink_dark"
+            android:textSize="42sp"
+            android:textColor="@color/text_bright"
             android:fontFamily="@font/greatvibesregular"
-            android:layout_marginTop="10dp"/>
+            android:textStyle="bold"
+            android:shadowColor="#80000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="3" />
 
-        <!-- Кнопка настроек -->
-        <ImageButton
-            android:id="@+id/btnSettings"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+        <!-- Кнопка Настройки -->
+        <FrameLayout
+            android:id="@+id/settings_button_container"
+            android:layout_width="50dp"
+            android:layout_height="100dp"
             android:layout_alignParentEnd="true"
-            android:layout_marginTop="20dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_settings"
-            app:tint="@color/text_bright"/>
+            android:layout_alignBottom="@id/page_name"
+            android:elevation="8dp">
+
+            <ImageButton
+                android:id="@+id/btnSettings"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:src="@drawable/settings"
+                android:contentDescription="Настройки"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                android:padding="8dp" />
+        </FrameLayout>
     </RelativeLayout>
 
     <!-- Панель поиска -->
@@ -58,7 +75,8 @@
             android:layout_height="wrap_content"
             android:hint="Введите город"
             android:background="@drawable/search_background"
-            android:padding="10dp"
+            android:paddingStart="8dp"
+            android:paddingTop="8dp"
             android:textColor="@color/bright_purple_medium"
             android:textSize="25sp"
             android:textStyle="bold"
@@ -70,7 +88,7 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/search_input"
             android:text="🔍"
-            android:textSize="32.dp"
+            android:textSize="28.dp"
             android:background="@android:color/transparent"
             android:textColor="@color/white"/>
     </RelativeLayout>
@@ -133,7 +151,7 @@
             android:layout_height="80dp"
             android:src="@drawable/ic_sunny"
             android:layout_gravity="center_vertical"
-            app:tint="@color/bright_yellow" />
+            app:tint="@android:color/holo_orange_dark" />
 
         <!-- Температура и состояние погоды -->
         <LinearLayout
@@ -161,28 +179,57 @@
                 android:layout_height="wrap_content"
                 android:text="Mist"
                 android:textSize="20sp"
-                android:textColor="@color/bright_pink_dark"
+                android:textColor="@color/text_bright"
                 android:fontFamily="@font/greatvibesregular"
                 android:layout_marginTop="5dp"/>
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Кнопка "Подробнее" -->
-    <Button
-        android:id="@+id/btnDetails"
-        android:layout_width="261dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/weather_info_container"
+    <!-- Кнопка "Поделиться" слева -->
+    <FrameLayout
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="24dp"
+
+        android:elevation="8dp">
+
+        <ImageButton
+            android:id="@+id/btnShare"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:src="@drawable/share"
+            android:contentDescription="Поделиться"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:padding="8dp" />
+    </FrameLayout>
+
+
+    <!-- Кнопка "Подробнее" справа -->
+    <FrameLayout
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="136dp"
-        android:layout_marginTop="222dp"
-        android:layout_marginEnd="14dp"
-        android:background="@android:color/transparent"
-        android:fontFamily="@font/greatvibesregular"
-        android:padding="10dp"
-        android:text="Подробнее..."
-        android:textColor="@color/white"
-        android:textSize="20sp" />
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:elevation="8dp">
+
+        <ImageButton
+            android:id="@+id/btnDetails"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:src="@drawable/read_more"
+            android:contentDescription="Подробнее"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:padding="8dp" />
+    </FrameLayout>
+
 
 </RelativeLayout>

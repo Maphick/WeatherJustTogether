@@ -1,14 +1,18 @@
 package ru.bear.weatherjusttogether.ui.fragments
 
 import android.content.Context
+import android.content.Intent
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
@@ -41,11 +45,12 @@ class TodayWeatherFragment : Fragment() {
     lateinit var suggestionsList: ListView
     lateinit var cityNameText: TextView
     lateinit var temperatureText: TextView
-
     lateinit var conditionText: TextView
-//lateinit var humidityText: TextView
-//lateinit var windText: TextView
+    lateinit var btnSettings: ImageView
+    lateinit var btnDetails: ImageView
     lateinit var weatherIcon: ImageView
+    lateinit var btnShare: ImageView
+    lateinit var topBar: View
 
 
     override fun onAttach(context: Context) {
@@ -64,8 +69,7 @@ class TodayWeatherFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        VMSettings()
-
+        topBar = view.findViewById<View>(R.id.top_bar)
         searchInput = view.findViewById<EditText>(R.id.search_input)
         searchButton = view.findViewById<Button>(R.id.btnSearch)
         suggestionsList = view.findViewById<ListView>(R.id.suggestions_list)
@@ -73,11 +77,33 @@ class TodayWeatherFragment : Fragment() {
         temperatureText = view.findViewById<TextView>(R.id.temperature_value)
         weatherIcon = view.findViewById(R.id.weather_icon)
         conditionText = view.findViewById<TextView>(R.id.condition_text)
-        //humidityText = view.findViewById<TextView>(R.id.humidity_value)
-        //windText = view.findViewById<TextView>(R.id.wind_value)
+        btnSettings = view.findViewById<ImageView>(R.id.btnSettings)
+        btnDetails = view.findViewById<ImageView>(R.id.btnDetails)
+        btnShare = view.findViewById<ImageView>(R.id.btnShare)
 
-        val btnDetails: Button = view.findViewById(R.id.btnDetails)
+        // настройка вьюмоделей
+        VMSettings()
 
+        // настройка кнопок
+        buttonsSettings()
+    }
+
+
+    // настройка кнопок
+    private fun buttonsSettings()
+    {
+        // анимайи топбара
+        topBar.translationY = -topBar.height.toFloat()
+        topBar.alpha = 0f
+        topBar.animate()
+            .translationY(0f)
+            .alpha(1f)
+            .setDuration(600)
+            .setInterpolator(DecelerateInterpolator())
+            .start()
+
+
+        // Кнопка "Подробнее"
         btnDetails.setOnClickListener {
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer, DetailedWeatherFragment())
@@ -85,13 +111,27 @@ class TodayWeatherFragment : Fragment() {
                 .commit()
         }
 
+        // Кнопка "Поделиться"
+        btnShare.setOnClickListener {
+            val textToShare = buildString {
+                append("Погода в городе: ${cityNameText.text}\n")
+                append("Температура: ${temperatureText.text}\n")
+                append("Состояние: ${conditionText.text}")
+            }
+            val shareIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, textToShare)
+                type = "text/plain"
+            }
+            startActivity(Intent.createChooser(shareIntent, "Поделиться прогнозом погоды"))
+        }
 
-        val btnSettings = view.findViewById<View>(R.id.btnSettings)
-        val topBar = view.findViewById<View>(R.id.top_bar)
+
         (btnSettings.layoutParams as ViewGroup.MarginLayoutParams).apply {
             topMargin = topBar.top - 100 // Перемещение на строку выше
         }
 
+        // Кнопка "Настройки"
         btnSettings.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer, SettingsFragment())
@@ -99,9 +139,10 @@ class TodayWeatherFragment : Fragment() {
                 .commit()
         }
 
+        //  Кнопка "Поиск города"
         searchButtonSettings()
-        //saveCity()
     }
+
 
     // кнопка поиска города по части слова
     private fun searchButtonSettings() {
@@ -167,21 +208,6 @@ class TodayWeatherFragment : Fragment() {
         }
     }
 
-    private fun saveCity() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            todayForecastViewModel.getSavedCity()?.let { lastCity ->
-                withContext(Dispatchers.Main) {
-                    // Не обновляем, если город уже установлен
-                    if (!lastCity.isNullOrEmpty() && lastCity != todayForecastViewModel.currentCity.value) {
-                        cityNameText.text = lastCity
-
-                        todayForecastViewModel.fetchWeather(lastCity)
-                        //hourlyForecastViewModel.fetchHourlyForecast(lastCity)
-                    }
-                }
-            }
-        }
-    }
 
     // настройка вью-модели
     private fun VMSettings() {
@@ -200,16 +226,32 @@ class TodayWeatherFragment : Fragment() {
 
     // обновляем отображение
     private fun updateUI(weather: TodayWeatherDomain) {
-        todayForecastViewModel.weather.observe(viewLifecycleOwner) { weather ->
-            weather?.let {
-                cityNameText.text = "${it.city}, ${it.region}, ${it.country}"
-                temperatureText.text = "${it.temp_c}°C"
-                conditionText.text = it.conditionText
-                //humidityText.text = "Влажность: ${it.humidity}%"
-                //windText.text = "Ветер: ${it.wind_kph} км/ч, ${it.wind_dir}"
+        weather?.let {
+            cityNameText.text = "${it.city}, ${it.region}, ${it.country}"
+            temperatureText.text = "${it.temp_c}°C"
+            conditionText.text = it.conditionText
+            Glide.with(this).load("https:${it.conditionIcon}").into(weatherIcon)
 
-                Glide.with(this).load("https:${it.conditionIcon}").into(weatherIcon)
+            // меняем цвет иконки погоды в зависимости от погоды
+            val condition = weather.conditionText.lowercase()
+
+            val colorRes = when {
+                condition.contains("солнечно") ||   condition.contains("ясно") || condition.contains("sunny") || condition.contains("clear") ->
+                    R.color.bright_yellow
+                condition.contains("дым") || condition.contains("облачн") || condition.contains("cloudy") || condition.contains("overcast") ->
+                    R.color.gray
+                condition.contains("дожд") || condition.contains("rain") ->
+                    R.color.dark_blue
+                condition.contains("снег") || condition.contains("snow") ->
+                    R.color.white
+                condition.contains("туман") || condition.contains("mist") || condition.contains("fog") ->
+                    R.color.light_gray
+                else -> null
             }
+
+            colorRes?.let {
+                weatherIcon.setColorFilter(ContextCompat.getColor(requireContext(), it), PorterDuff.Mode.SRC_IN)
+            } ?: weatherIcon.clearColorFilter()
         }
     }
 

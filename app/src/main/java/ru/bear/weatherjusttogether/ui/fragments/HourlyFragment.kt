@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -20,12 +21,12 @@ import ru.bear.weatherjusttogether.ui.adapters.HourlyAdapter
 import ru.bear.weatherjusttogether.viewmodel.HourlyForecastViewModel
 import ru.bear.weatherjusttogether.viewmodel.HourlyForecastViewModelFactory
 import javax.inject.Inject
+import kotlin.collections.isNotEmpty
 
 class HourlyFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory: HourlyForecastViewModelFactory
     private lateinit var viewModel: HourlyForecastViewModel
-
     private lateinit var hourlyRecyclerView: RecyclerView
     private lateinit var cityNameText: TextView
     private var selectedCity: String? = null
@@ -50,28 +51,38 @@ class HourlyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        VMSettings()
-
-        hourlyRecyclerView = view.findViewById(R.id.hourlyRecyclerView)
         cityNameText = view.findViewById(R.id.city_name)
+        hourlyRecyclerView = view.findViewById(R.id.hourlyRecyclerView)
         hourlyRecyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
 
         // Создаем адаптер один раз
         val hourlyAdapter = HourlyAdapter()
         hourlyRecyclerView.adapter = hourlyAdapter
-
-
-        // Подписываемся на LiveData
-        viewModel.hourlyForecast.observe(viewLifecycleOwner) { hourlyData ->
-            if (!hourlyData.isNullOrEmpty()) {
-                hourlyAdapter.submitList(hourlyData) // ✅ Обновляем список
-            }
-        }
+        // настройка вью-модели
+        VMSettings(hourlyAdapter)
     }
 
 
 
-    private fun VMSettings() {
-        viewModel = ViewModelProvider(this, viewModelFactory).get(HourlyForecastViewModel::class.java)
+    private fun VMSettings(hourlyAdapter: HourlyAdapter) {
+        viewModel = ViewModelProvider(this, viewModelFactory).
+            get(HourlyForecastViewModel::class.java)
+
+        // Подписка на LiveData для обновления списка
+        viewModel.hourlyForecast.observe(viewLifecycleOwner) { hourlyData ->
+            if (hourlyData!= null && hourlyData.isNotEmpty()) { // Проверка, если список не пуст
+                hourlyAdapter.submitList(hourlyData) // Обновляем список
+            } else {
+                Toast.makeText(requireContext(),
+                    "Нет данных о прогнозе", Toast.LENGTH_SHORT).show()
+            }
+        }
+        // подписка на изменение названия города
+        viewModel.cityName.observe(viewLifecycleOwner) { city ->
+            cityNameText.text = city
+        }
+
+        // Запуск загрузки
+        viewModel.fetchForecastWithFallback(selectedCity)
     }
 }

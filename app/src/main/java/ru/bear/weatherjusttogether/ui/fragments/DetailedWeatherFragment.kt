@@ -40,16 +40,11 @@ class DetailedWeatherFragment : Fragment() {
     @Inject
     lateinit var todayForecastViewModelFactory: TodayForecastViewModelFactory
     private lateinit var todayForecastViewModel: TodayForecastViewModel
-
     @Inject
     lateinit var hourlyМiewModelFactory: HourlyForecastViewModelFactory
     private lateinit var hourlyForecastViewModel: HourlyForecastViewModel
 
-
     lateinit var cityNameText: TextView
-    //lateinit var conditionText: TextView
-    //lateinit var temperatureText: TextView
-    //lateinit var weatherIcon: ImageView
     lateinit var humidityText: TextView
     lateinit var windText: TextView
     lateinit var pressureText: TextView
@@ -57,7 +52,9 @@ class DetailedWeatherFragment : Fragment() {
     lateinit var visibilityText: TextView
     lateinit var feelsLikeText: TextView
     lateinit var precipitationText: TextView
-
+    lateinit var btnBack: ImageButton
+    lateinit var btnSettings: ImageButton
+    lateinit var topBar: View
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -73,36 +70,7 @@ class DetailedWeatherFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        VMSettings()
-
-        todayForecastViewModel.currentCity.observe(viewLifecycleOwner) { city ->
-            if (!city.isNullOrEmpty() && city != cityNameText.text.toString()) {
-                cityNameText.text = city
-
-                todayForecastViewModel.fetchWeather(city)
-                hourlyForecastViewModel.fetchHourlyForecast(city)
-            }
-        }
-
-        val btnSettings = view.findViewById<View>(R.id.btnSettings)
-        val topBar = view.findViewById<View>(R.id.top_bar)
-        (btnSettings.layoutParams as ViewGroup.MarginLayoutParams).apply {
-            topMargin = topBar.top - 100 // Перемещение на строку выше
-        }
-
-        btnSettings.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, SettingsFragment())
-                .addToBackStack(null)
-                .commit()
-        }
-
-        saveCity()
-
         cityNameText = view.findViewById(R.id.city_name)
-        //conditionText= view.findViewById(R.id.condition_text)
-        //temperatureText = view.findViewById(R.id.temperature_value)
-        //weatherIcon = view.findViewById(R.id.weather_icon)
         humidityText = view.findViewById(R.id.humidity_value)
         windText = view.findViewById(R.id.wind_value)
         pressureText = view.findViewById(R.id.pressure_value)
@@ -110,53 +78,44 @@ class DetailedWeatherFragment : Fragment() {
         visibilityText = view.findViewById(R.id.visibility_value)
         feelsLikeText = view.findViewById(R.id.feels_like_value)
         precipitationText = view.findViewById(R.id.precipitation_value)
-        //val btnBack: ImageButton = view.findViewById(R.id.btnBack)
+        btnBack = view.findViewById<ImageButton>(R.id.btnBack)
+        btnSettings = view.findViewById<ImageButton>(R.id.btnSettings)
+        topBar = view.findViewById<View>(R.id.top_bar)
 
-        val btnBack: ImageButton = view.findViewById(R.id.btnBack)
+        VMSettings()
+        buttonsSettings()
+    }
+
+    // настройка кнопок
+    private fun buttonsSettings()
+    {
+        (btnSettings.layoutParams as ViewGroup.MarginLayoutParams).apply {
+            topMargin = topBar.top - 100 // Перемещение на строку выше
+        }
         btnBack.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
         }
-
-
-        todayForecastViewModel = ViewModelProvider(this, todayForecastViewModelFactory)
-            .get(TodayForecastViewModel::class.java)
-
-        todayForecastViewModel.weather.observe(viewLifecycleOwner) { weather ->
-            weather?.let {
-                cityNameText.text = "${it.city}, ${it.region}, ${it.country}"
-                //conditionText.text = it.conditionText
-                //temperatureText.text = "${it.temp_c}°C"
-                humidityText.text = "${it.humidity}%"
-                windText.text = "${it.wind_kph} км/ч, ${it.wind_dir}"
-                pressureText.text = "${it.pressure_mb} hPa"
-                uvText.text = "${it.uv}"
-                visibilityText.text = "${it.vis_km} км"
-                feelsLikeText.text = "${it.feelslike_c}°C"
-                precipitationText.text = "${it.precip_mm} мм"
-
-                //Glide.with(this).load("https:${it.conditionIcon}").into(weatherIcon)
-            }
+        btnSettings.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, SettingsFragment())
+                .addToBackStack(null)
+                .commit()
         }
-
-        /*btnBack.setOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack()
-        }*/
     }
 
-    private fun Init()
-    {
-
-    }
 
     private fun VMSettings() {
-        todayForecastViewModel = ViewModelProvider(this, todayForecastViewModelFactory).get(TodayForecastViewModel::class.java)
+        todayForecastViewModel = ViewModelProvider(this, todayForecastViewModelFactory)
+            .get(TodayForecastViewModel::class.java)
         // Подписка на LiveData
         todayForecastViewModel.weather.observe(viewLifecycleOwner) { weather ->
             if (weather != null) {
+                // обновляем погоду
                 updateUI(weather)
+                // запрашиваем почасовую погоду
+                hourlyForecastViewModel.fetchForecastWithFallback(weather.city)
             }
         }
-
         hourlyForecastViewModel = ViewModelProvider(this, hourlyМiewModelFactory)
             .get(HourlyForecastViewModel::class.java)
         // Подписка на LiveData
@@ -168,6 +127,8 @@ class DetailedWeatherFragment : Fragment() {
             }
         }
     }
+
+
 
     private fun updateUI(weather: TodayWeatherDomain) {
         view?.let {
@@ -185,42 +146,8 @@ class DetailedWeatherFragment : Fragment() {
             if (pressureText.text.toString() != "${weather.pressure_mb} hPa") {
                 pressureText.text = "${weather.pressure_mb} hPa"
             }
-            /*if (temperatureText.text.toString() != "${weather.temp_c}°C") {
-                temperatureText.text = "${weather.temp_c}°C"
-            }
-            if (conditionText.text.toString() != weather.conditionText) {
-                conditionText.text = weather.conditionText
-            }
-
-            // Загружаем иконку погоды только если она изменилась
-            if (!weather.conditionIcon.isNullOrEmpty() && weatherIcon.tag != weather.conditionIcon) {
-                Glide.with(this)
-                    .load("https:${weather.conditionIcon}")
-                    .into(weatherIcon)
-                weatherIcon.tag = weather.conditionIcon //
-            }
-         */
-
         }
     }
-
-
-    private fun saveCity() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            todayForecastViewModel.getSavedCity()?.let { lastCity ->
-                withContext(Dispatchers.Main) {
-                    // Не обновляем, если город уже установлен
-                    if (!lastCity.isNullOrEmpty() && lastCity != todayForecastViewModel.currentCity.value) {
-                        cityNameText.text = lastCity
-
-                        todayForecastViewModel.fetchWeather(lastCity)
-                        hourlyForecastViewModel.fetchHourlyForecast(lastCity)
-                    }
-                }
-            }
-        }
-    }
-
 
 
 
