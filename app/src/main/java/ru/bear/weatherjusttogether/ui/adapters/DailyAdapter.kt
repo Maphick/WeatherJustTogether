@@ -37,13 +37,13 @@ class DailyAdapter : ListAdapter<DailyWeatherDomain, DailyAdapter.DailyViewHolde
         holder.maxTempText.text = "${day.maxtemp_c}°C"
         holder.minTempText.text = "${day.mintemp_c}°C"
 
-        // ✅ Glide для загрузки иконки погоды
+        // Glide для загрузки иконки погоды
         Glide.with(holder.itemView.context)
             .load(day.conditionIcon)
             .placeholder(R.drawable.ic_sunny)
             .into(holder.conditionIcon)
 
-        // ✅ Применение цвета в зависимости от условий погоды
+        // Применение цвета в зависимости от условий погоды
         when {
             day.conditionText.contains("дождь", ignoreCase = true) -> {
                 holder.conditionIcon.setColorFilter(ContextCompat.getColor(holder.itemView.context, R.color.rainy_color))

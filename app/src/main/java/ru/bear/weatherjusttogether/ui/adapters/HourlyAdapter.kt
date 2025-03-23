@@ -1,11 +1,14 @@
 package ru.bear.weatherjusttogether.ui.adapters
 
+import android.graphics.PorterDuff
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -34,7 +37,8 @@ class HourlyAdapter : ListAdapter<HourlyWeatherDomain, HourlyAdapter.HourlyViewH
     }
 
     override fun onBindViewHolder(holder: HourlyViewHolder, position: Int) {
-        val weather = getItem(position) // ✅ Теперь получаем элемент через `getItem()`
+        val context = holder.itemView.context
+        val weather = getItem(position) // получаем элемент через `getItem()`
 
         holder.time.text = weather.time.substring(11) // Форматируем время: "2024-03-10 15:00" → "15:00"
         holder.temp.text = "${weather.temp_c}°C"
@@ -56,17 +60,37 @@ class HourlyAdapter : ListAdapter<HourlyWeatherDomain, HourlyAdapter.HourlyViewH
         // Вероятность дождя
         holder.rainChanceLabel.text = "Вероятность дождя:"
         holder.rainChanceValue.text = "${weather.chance_of_rain}%"
+
+        // меняем цвет иконки погоды в зависимости от погоды
+        val condition = weather.conditionText.lowercase()
+
+        val colorRes = when {
+            condition.contains("солнечно") ||   condition.contains("ясно") || condition.contains("sunny") || condition.contains("clear") ->
+                R.color.bright_yellow
+            condition.contains("дым") || condition.contains("облачн") || condition.contains("cloudy") || condition.contains("overcast") ->
+                R.color.gray
+            condition.contains("дожд") || condition.contains("rain") ->
+                R.color.dark_blue
+            condition.contains("снег") || condition.contains("snow") ->
+                R.color.white
+            condition.contains("туман") || condition.contains("mist") || condition.contains("fog") ->
+                R.color.light_gray
+            else -> null
+        }
+
+
+        colorRes?.let {
+            holder.icon.setColorFilter(ContextCompat.getColor(context, it), PorterDuff.Mode.SRC_IN)
+        } ?: holder.icon.clearColorFilter()
     }
 }
-
-
-/** 🔹 DiffUtil для оптимизированного обновления списка */
+/** DiffUtil для оптимизированного обновления списка */
 class HourlyDiffCallback : DiffUtil.ItemCallback<HourlyWeatherDomain>() {
     override fun areItemsTheSame(oldItem: HourlyWeatherDomain, newItem: HourlyWeatherDomain): Boolean {
-        return oldItem.time == newItem.time // ✅ Проверяем, что время одинаковое
+        return oldItem.time == newItem.time // Проверяем, что время одинаковое
     }
 
     override fun areContentsTheSame(oldItem: HourlyWeatherDomain, newItem: HourlyWeatherDomain): Boolean {
-        return oldItem == newItem // ✅ Проверяем, что объекты полностью идентичны
+        return oldItem == newItem // Проверяем, что объекты полностью идентичны
     }
 }

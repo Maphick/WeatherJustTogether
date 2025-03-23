@@ -50,16 +50,14 @@ class DailyFragment : Fragment() {
 
         dailyRecyclerView = view.findViewById(R.id.dailyRecyclerView)
         cityNameText = view.findViewById(R.id.city_name)
-        dailyRecyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+        dailyRecyclerView.layoutManager =
+            LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
 
         // Используем адаптер один раз и передаем его в RecyclerView
         val dailyAdapter = DailyAdapter()
         dailyRecyclerView.adapter = dailyAdapter
 
         VMSettings(dailyAdapter)
-
-
-
     }
 
 
