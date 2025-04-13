@@ -85,12 +85,12 @@ class SplashFragment : Fragment() {
 
         // Переход на HomeFragment через 4 секунды
         Handler(Looper.getMainLooper()).postDelayed({
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, TodayWeatherFragment())
-                .commit()
-
-            // Показываем нижнюю панель навигации
-            (activity as? MainActivity)?.bottomNav?.visibility = View.VISIBLE
-        }, 4000)
+            if (isAdded && !isDetached) {
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, TodayWeatherFragment())
+                    .commit()
+                (requireActivity() as? MainActivity)?.bottomNav?.visibility = View.VISIBLE
+            }
+        }, 400)
     }
 }

@@ -1,9 +1,6 @@
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#80FFFFFF" /> <!-- Белый цвет с 50% прозрачностью -->
-    <corners android:radius="16dp" /> <!-- Радиус закругления углов -->
-    <padding
-        android:left="8dp"
-        android:top="8dp"
-        android:right="8dp"
-        android:bottom="8dp"/>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="?attr/colorBackground"/> <!-- Полупрозрачный белый -->
+    <corners android:radius="16dp" />
+    <padding android:left="12dp" android:top="12dp" android:right="12dp" android:bottom="12dp" />
 </shape>

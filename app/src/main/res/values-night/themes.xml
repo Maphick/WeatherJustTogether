@@ -1,7 +1,44 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+
+    <!-- Базовая тёмная тема -->
     <style name="Base.Theme.WeatherJustTogether" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <!-- Основные цвета -->
+        <item name="colorPrimary">@color/bright_pink_dark</item>
+        <item name="colorOnPrimary">@color/text_bright</item>
+
+        <item name="colorSecondary">@color/bright_purple_dark</item>
+        <item name="colorOnSecondary">@color/text_bright</item>
+
+        <item name="colorTertiary">@color/gradient_end</item>
+        <item name="colorOnTertiary">@color/text_bright</item>
+
+        <!-- Фон -->
+        <item name="colorBackground">@color/dark_blue</item>
+        <item name="colorOnBackground">@color/text_bright</item>
+
+        <!-- Поверхности -->
+        <item name="colorSurface">@color/gray</item>
+        <item name="colorOnSurface">@color/text_bright</item>
+
+        <!-- Системные -->
+        <item name="android:statusBarColor" tools:targetApi="l">@color/bright_pink_dark</item>
+        <item name="android:navigationBarColor" tools:targetApi="l">@color/bright_pink_dark</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+        <!-- Дополнительные цвета -->
+        <item name="colorTitle">@color/bright_pink_light</item>
+        <item name="colorPrimaryText">@color/light_gray</item>
+        <item name="colorSecondaryText">@color/bright_purple_dark</item>
+        <item name="colorAccent">@color/dark_blue</item>
     </style>
+
+    <!-- Основная тема -->
+    <style name="Theme.WeatherJustTogether" parent="Base.Theme.WeatherJustTogether" />
+
+    <!-- Тема Splash (ночная) -->
+    <style name="Theme.WeatherApp.Splash" parent="Base.Theme.WeatherJustTogether">
+        <item name="android:windowBackground">@color/dark_blue</item>
+    </style>
+
 </resources>

@@ -1,8 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bright_purple_light"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="?attr/colorBackground">
 
     <!-- Фоновое изображение -->
     <ImageView
@@ -21,7 +21,6 @@
         android:padding="8dp"
         android:elevation="0dp">
 
-
         <!-- Заголовок -->
         <TextView
             android:id="@+id/page_name"
@@ -30,7 +29,7 @@
             android:layout_centerInParent="true"
             android:text="Прогноз на сегодня"
             android:textSize="42sp"
-            android:textColor="@color/text_bright"
+            android:textColor="?attr/colorTitle"
             android:fontFamily="@font/greatvibesregular"
             android:textStyle="bold"
             android:shadowColor="#80000000"
@@ -72,28 +71,28 @@
         <EditText
             android:id="@+id/search_input"
             android:layout_width="300dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:hint="Введите город"
             android:background="@drawable/search_background"
             android:paddingStart="8dp"
             android:paddingTop="8dp"
-            android:textColor="@color/bright_purple_medium"
+            android:textColor="?attr/colorPrimaryText"
             android:textSize="25sp"
             android:textStyle="bold"
-            android:fontFamily="@font/greatvibesregular"/>
+            android:fontFamily="sans-serif-medium" />
 
         <Button
             android:id="@+id/btnSearch"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/search_input"
             android:text="🔍"
-            android:textSize="28.dp"
+            android:textSize="25sp"
             android:background="@android:color/transparent"
-            android:textColor="@color/white"/>
+            android:textColor="?attr/colorOnBackground" />
     </RelativeLayout>
 
-    <!-- Список предложенных городов (выпадающий список) -->
+    <!-- Список предложенных городов -->
     <ListView
         android:id="@+id/suggestions_list"
         android:layout_width="match_parent"
@@ -107,7 +106,9 @@
         android:dividerHeight="10dp"
         android:padding="8dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"/>
+        android:layout_marginRight="16dp" />
+
+    <!-- Название города -->
     <LinearLayout
         android:id="@+id/city_info"
         android:layout_width="match_parent"
@@ -115,21 +116,20 @@
         android:gravity="left"
         android:orientation="horizontal"
         android:paddingStart="16dp"
-        android:layout_below="@id/search_bar"
-        >
-        <!-- Название города -->
+        android:layout_below="@id/search_bar">
+
         <TextView
             android:id="@+id/city_name"
-            android:layout_margin="0.dp"
+            android:layout_margin="0dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
             android:textSize="34sp"
-            android:textColor="@color/bright_purple_dark"
-            android:fontFamily="@font/greatvibesregular"
+            android:textColor="?attr/colorTitle"
+            android:fontFamily="sans-serif-medium"
             android:textStyle="bold"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp" />
     </LinearLayout>
 
     <!-- Основная информация о погоде -->
@@ -144,16 +144,15 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp">
 
-        <!-- Иконка погоды (СЛЕВА) -->
+        <!-- Иконка погоды -->
         <ImageView
             android:id="@+id/weather_icon"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:src="@drawable/ic_sunny"
             android:layout_gravity="center_vertical"
-            app:tint="@android:color/holo_orange_dark" />
+            app:tint="?attr/colorAccent" />
 
-        <!-- Температура и состояние погоды -->
         <LinearLayout
             android:id="@+id/weather_info"
             android:layout_width="0dp"
@@ -167,11 +166,11 @@
                 android:id="@+id/temperature_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
                 android:text="7°C"
+                android:textColor="?attr/colorAccent"
                 android:textSize="44sp"
-                android:textColor="@color/bright_pink_medium"
-                android:fontFamily="@font/greatvibesregular"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/condition_text"
@@ -179,13 +178,13 @@
                 android:layout_height="wrap_content"
                 android:text="Mist"
                 android:textSize="20sp"
-                android:textColor="@color/text_bright"
-                android:fontFamily="@font/greatvibesregular"
-                android:layout_marginTop="5dp"/>
+                android:textColor="?attr/colorSecondaryText"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginTop="5dp" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Кнопка "Поделиться" слева -->
+    <!-- Кнопка "Поделиться" -->
     <FrameLayout
         android:layout_width="60dp"
         android:layout_height="60dp"
@@ -193,7 +192,6 @@
         android:layout_alignParentStart="true"
         android:layout_marginStart="24dp"
         android:layout_marginBottom="24dp"
-
         android:elevation="8dp">
 
         <ImageButton
@@ -208,8 +206,7 @@
             android:padding="8dp" />
     </FrameLayout>
 
-
-    <!-- Кнопка "Подробнее" справа -->
+    <!-- Кнопка "Подробнее" -->
     <FrameLayout
         android:layout_width="60dp"
         android:layout_height="60dp"
@@ -230,6 +227,5 @@
             android:adjustViewBounds="true"
             android:padding="8dp" />
     </FrameLayout>
-
 
 </RelativeLayout>

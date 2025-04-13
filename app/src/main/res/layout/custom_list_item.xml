@@ -12,15 +12,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        android:textColor="@color/text_bright"
-        android:fontFamily="@font/greatvibesregular"
+        android:textColor="@color/bright_yellow"
+        android:fontFamily="sans-serif-medium"
         android:textStyle="bold"/>
 
     <TextView
         android:id="@+id/city_region_country"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/greatvibesregular"
-        android:textSize="14sp"
+        android:textColor="@color/gray"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="16sp"
         />
 </LinearLayout>

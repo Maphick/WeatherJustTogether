@@ -30,11 +30,17 @@ import ru.bear.weatherjusttogether.R
 import ru.bear.weatherjusttogether.WeatherApp
 import ru.bear.weatherjusttogether.domain.models.HourlyWeatherDomain
 import ru.bear.weatherjusttogether.domain.models.TodayWeatherDomain
+import ru.bear.weatherjusttogether.utils.PressureUnit
+import ru.bear.weatherjusttogether.utils.SettingsManager
+import ru.bear.weatherjusttogether.utils.TemperatureUnit
+import ru.bear.weatherjusttogether.utils.WeatherUnitConverter
+import ru.bear.weatherjusttogether.utils.WindSpeedUnit
 import ru.bear.weatherjusttogether.viewmodel.HourlyForecastViewModel
 import ru.bear.weatherjusttogether.viewmodel.HourlyForecastViewModelFactory
 import ru.bear.weatherjusttogether.viewmodel.TodayForecastViewModel
 import ru.bear.weatherjusttogether.viewmodel.TodayForecastViewModelFactory
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 class DetailedWeatherFragment : Fragment() {
     @Inject
@@ -44,6 +50,10 @@ class DetailedWeatherFragment : Fragment() {
     lateinit var hourlyМiewModelFactory: HourlyForecastViewModelFactory
     private lateinit var hourlyForecastViewModel: HourlyForecastViewModel
 
+    // хелпер для SharedPreferences
+    private lateinit var settingsManager: SettingsManager
+
+    // UI
     lateinit var cityNameText: TextView
     lateinit var humidityText: TextView
     lateinit var windText: TextView
@@ -59,6 +69,7 @@ class DetailedWeatherFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as WeatherApp).appComponent.inject(this)
+        settingsManager = SettingsManager(context) //
     }
 
     override fun onCreateView(
@@ -71,13 +82,13 @@ class DetailedWeatherFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         cityNameText = view.findViewById(R.id.city_name)
-        humidityText = view.findViewById(R.id.humidity_value)
-        windText = view.findViewById(R.id.wind_value)
-        pressureText = view.findViewById(R.id.pressure_value)
-        uvText = view.findViewById(R.id.uv_value)
-        visibilityText = view.findViewById(R.id.visibility_value)
-        feelsLikeText = view.findViewById(R.id.feels_like_value)
-        precipitationText = view.findViewById(R.id.precipitation_value)
+        humidityText = view.findViewById(R.id.info_humidity)
+        windText = view.findViewById(R.id.info_wind)
+        pressureText = view.findViewById(R.id.info_pressure)
+        uvText = view.findViewById(R.id.info_uv)
+        visibilityText = view.findViewById(R.id.info_visibility)
+        feelsLikeText = view.findViewById(R.id.info_feels_like)
+        precipitationText = view.findViewById(R.id.info_pressure)
         btnBack = view.findViewById<ImageButton>(R.id.btnBack)
         btnSettings = view.findViewById<ImageButton>(R.id.btnSettings)
         topBar = view.findViewById<View>(R.id.top_bar)
@@ -133,23 +144,21 @@ class DetailedWeatherFragment : Fragment() {
 
     private fun updateUI(weather: TodayWeatherDomain) {
         view?.let {
-            // Обновляем UI с помощью данных из доменной модели
-            //  только изменённые данные обновляют UI
-            if (cityNameText.text.toString() != "${weather.city}, ${weather.region}, ${weather.country}") {
-                cityNameText.text = "${weather.city}, ${weather.region}, ${weather.country}"
-            }
-            if (windText.text.toString() != "${weather.wind_kph} км/ч, ${weather.wind_dir}") {
-                windText.text = "${weather.wind_kph} км/ч, ${weather.wind_dir}"
-            }
-            if (humidityText.text.toString() != "${weather.humidity}%") {
-                humidityText.text = "${weather.humidity}%"
-            }
-            if (pressureText.text.toString() != "${weather.pressure_mb} hPa") {
-                pressureText.text = "${weather.pressure_mb} hPa"
-            }
+            cityNameText.text = "${weather.city}, ${weather.region}, ${weather.country}"
+            humidityText.text = "${weather.humidity}%"
+            uvText.text = weather.uv.toString()
+            visibilityText.text = "${weather.vis_km} км"
+            precipitationText.text = "${weather.precip_mm} мм"
+
+            // Температура (с учётом настроек)
+            feelsLikeText.text = WeatherUnitConverter.convertTemperature(weather.feelslike_c, settingsManager.temperatureUnit)
+            // Ветер
+            windText.text = WeatherUnitConverter.convertWind(weather.wind_kph, weather.wind_dir, settingsManager.windSpeedUnit)
+            // Давление
+            pressureText.text = WeatherUnitConverter.convertPressure(weather.pressure_mb, settingsManager.pressureUnit)
+
         }
     }
-
 
 
     private fun updateChart(hourlyData: List<HourlyWeatherDomain>) {

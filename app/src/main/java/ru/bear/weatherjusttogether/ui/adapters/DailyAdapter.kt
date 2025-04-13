@@ -12,8 +12,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.bear.weatherjusttogether.R
 import ru.bear.weatherjusttogether.domain.models.DailyWeatherDomain
+import ru.bear.weatherjusttogether.utils.SettingsManager
+import ru.bear.weatherjusttogether.utils.TemperatureUnit
 
-class DailyAdapter : ListAdapter<DailyWeatherDomain, DailyAdapter.DailyViewHolder>(DailyDiffCallback()) {
+class DailyAdapter(
+    private val settingsManager: SettingsManager
+) : ListAdapter<DailyWeatherDomain, DailyAdapter.DailyViewHolder>(DailyDiffCallback()) {
 
     class DailyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val dateText: TextView = itemView.findViewById(R.id.dateText)
@@ -34,38 +38,55 @@ class DailyAdapter : ListAdapter<DailyWeatherDomain, DailyAdapter.DailyViewHolde
 
         holder.dateText.text = day.date
         holder.conditionText.text = day.conditionText
-        holder.maxTempText.text = "${day.maxtemp_c}°C"
-        holder.minTempText.text = "${day.mintemp_c}°C"
 
-        // Glide для загрузки иконки погоды
+        val unit = when (settingsManager.temperatureUnit) {
+            TemperatureUnit.CELSIUS -> "°C"
+            TemperatureUnit.FAHRENHEIT -> "°F"
+            TemperatureUnit.KELVIN -> "°K"
+        }
+
+        val maxTemp = formatTemperature(day.maxtemp_c)
+        val minTemp = formatTemperature(day.mintemp_c)
+
+        holder.maxTempText.text = "$maxTemp$unit"
+        holder.minTempText.text = "$minTemp$unit"
+
         Glide.with(holder.itemView.context)
             .load(day.conditionIcon)
             .placeholder(R.drawable.ic_sunny)
             .into(holder.conditionIcon)
 
-        // Применение цвета в зависимости от условий погоды
+        // Цветовая обработка иконок в зависимости от текста
+        val context = holder.itemView.context
         when {
             day.conditionText.contains("дождь", ignoreCase = true) -> {
-                holder.conditionIcon.setColorFilter(ContextCompat.getColor(holder.itemView.context, R.color.rainy_color))
+                holder.conditionIcon.setColorFilter(ContextCompat.getColor(context, R.color.rainy_color))
             }
             day.conditionText.contains("облачно", ignoreCase = true) -> {
-                holder.conditionIcon.setColorFilter(ContextCompat.getColor(holder.itemView.context, R.color.cloudy_color))
+                holder.conditionIcon.setColorFilter(ContextCompat.getColor(context, R.color.cloudy_color))
             }
             day.conditionText.contains("солнечно", ignoreCase = true) ||
                     day.conditionText.contains("ясно", ignoreCase = true) -> {
-                holder.conditionIcon.setColorFilter(ContextCompat.getColor(holder.itemView.context, R.color.sunny_color))
+                holder.conditionIcon.setColorFilter(ContextCompat.getColor(context, R.color.sunny_color))
             }
             day.conditionText.contains("снег", ignoreCase = true) -> {
-                holder.conditionIcon.setColorFilter(ContextCompat.getColor(holder.itemView.context, R.color.snow_color))
+                holder.conditionIcon.setColorFilter(ContextCompat.getColor(context, R.color.snow_color))
             }
             else -> {
                 holder.conditionIcon.clearColorFilter()
             }
         }
     }
+
+    private fun formatTemperature(celsius: Double): Int {
+        return when (settingsManager.temperatureUnit) {
+            TemperatureUnit.CELSIUS -> celsius.toInt()
+            TemperatureUnit.FAHRENHEIT -> (celsius * 9 / 5 + 32).toInt()
+            TemperatureUnit.KELVIN -> (celsius + 273.15).toInt()
+        }
+    }
 }
 
-/** 🔹 DiffUtil для эффективного обновления списка */
 class DailyDiffCallback : DiffUtil.ItemCallback<DailyWeatherDomain>() {
     override fun areItemsTheSame(oldItem: DailyWeatherDomain, newItem: DailyWeatherDomain): Boolean {
         return oldItem.date == newItem.date

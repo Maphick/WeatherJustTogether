@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Светлый полупрозрачный фон с лёгким розоватым оттенком -->
+    <solid android:color="?attr/colorOnBackground" /> <!-- #F5E3F5 — нежно-сиреневый / розоватый -->
+
+    <corners android:radius="16dp" />
+
+    <padding
+        android:left="12dp"
+        android:top="12dp"
+        android:right="12dp"
+        android:bottom="12dp" />
+</shape>

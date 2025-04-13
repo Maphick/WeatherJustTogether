@@ -1,8 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bright_purple_light"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="?attr/colorBackground">
 
     <!-- Фоновое изображение -->
     <ImageView
@@ -29,13 +29,14 @@
             android:layout_centerInParent="true"
             android:text="Прогноз по дням"
             android:textSize="42sp"
-            android:textColor="@color/text_bright"
+            android:textColor="?attr/colorTitle"
             android:fontFamily="@font/greatvibesregular"
             android:textStyle="bold"
             android:shadowColor="#80000000"
             android:shadowDx="2"
             android:shadowDy="2"
             android:shadowRadius="3" />
+
         <!-- Кнопка Настройки -->
         <FrameLayout
             android:id="@+id/settings_button_container"
@@ -58,28 +59,26 @@
         </FrameLayout>
     </RelativeLayout>
 
+    <!-- Название города -->
     <LinearLayout
         android:id="@+id/city_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="left"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
         android:layout_below="@id/top_bar"
-        >
-        <!-- Название города -->
+        android:gravity="start"
+        android:orientation="horizontal"
+        android:paddingStart="16dp">
+
         <TextView
             android:id="@+id/city_name"
-            android:layout_margin="0.dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:text=""
             android:textSize="34sp"
-            android:textColor="@color/bright_purple_dark"
-            android:fontFamily="@font/greatvibesregular"
+            android:textColor="?attr/colorOnBackground"
+            android:fontFamily="sans-serif-medium"
             android:textStyle="bold"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp" />
     </LinearLayout>
 
     <!-- RecyclerView для прогноза на 14 дней -->
@@ -87,7 +86,7 @@
         android:id="@+id/dailyRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/city_info"
+        android:layout_below="@id/city_info"
         android:layout_marginTop="0dp"
         android:clipToPadding="false"
         android:padding="8dp"

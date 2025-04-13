@@ -1,9 +1,40 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+
+    <!-- Базовая тема приложения -->
     <style name="Base.Theme.WeatherJustTogether" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+        <!-- Основные цвета -->
+        <item name="colorPrimary">@color/bright_purple_medium</item>
+        <item name="colorOnPrimary">@color/text_bright</item>
+
+        <item name="colorSecondary">@color/bright_pink_medium</item>
+        <item name="colorOnSecondary">@color/text_bright</item>
+
+        <item name="colorTertiary">@color/gradient_start</item>
+        <item name="colorOnTertiary">@color/text_bright</item>
+
+        <!-- Фон -->
+        <item name="colorBackground">@color/bright_purple_light</item>
+        <item name="colorOnBackground">@color/text_bright</item>
+
+        <!-- Поверхности -->
+        <item name="colorSurface">@color/bright_pink_light</item>
+        <item name="colorOnSurface">@color/text_dark</item>
+
+        <!-- Дополнительные цвета -->
+        <item name="colorTitle">@color/bright_purple_dark</item>
+        <item name="colorPrimaryText">@color/text_dark</item>
+        <item name="colorSecondaryText">@color/text_hint</item>
+        <item name="colorAccent">@color/bright_pink_medium</item>
+
+        <!-- Системные -->
+        <item name="android:statusBarColor" tools:targetApi="l">@color/bright_purple_dark</item>
+        <item name="android:navigationBarColor" tools:targetApi="l">@color/bright_purple_dark</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
     </style>
 
+    <!-- Основная тема -->
     <style name="Theme.WeatherJustTogether" parent="Base.Theme.WeatherJustTogether" />
 </resources>

@@ -19,14 +19,27 @@ class MainActivity : AppCompatActivity() {
     // Панель нижней навигации
     lateinit var bottomNav: BottomNavigationView
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("selected_item", bottomNav.selectedItemId)
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Снимаем splash-тему и применяем основную тему приложения
+        setTheme(R.style.Theme_WeatherJustTogether)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         bottomNav = findViewById(R.id.bottomNav)
 
         // Скрываем панель навигации на старте
-        bottomNav.visibility = View.GONE
+        if (savedInstanceState == null) {
+            bottomNav.visibility = View.GONE
+            showSplashFragment()
+        } else {
+            bottomNav.visibility = View.VISIBLE
+        }
 
         // Показываем SplashFragment при первом запуске
         if (savedInstanceState == null) {
@@ -55,6 +68,25 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+        // Восстанавливаем навигацию после recreate()
+        if (savedInstanceState != null) {
+            // Восстанавливаем выбранный пункт меню
+            val selectedItem = savedInstanceState.getInt("selected_item", R.id.nav_home)
+            bottomNav.selectedItemId = selectedItem
+
+            // Показываем фрагмент заново
+            when (selectedItem) {
+                R.id.nav_home -> openFragment(TodayWeatherFragment())
+                R.id.nav_hourly -> openFragment(HourlyFragment())
+                R.id.nav_daily -> openFragment(DailyFragment())
+                R.id.nav_alerts -> openFragment(AlertsFragment())
+            }
+
+            // Обязательно показать нижнее меню
+            bottomNav.visibility = View.VISIBLE
+        }
+
     }
 
     private fun showSplashFragment() {
