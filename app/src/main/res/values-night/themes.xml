@@ -14,7 +14,7 @@
 
         <!-- Фон -->
         <item name="colorBackground">@color/dark_blue</item>
-        <item name="colorOnBackground">@color/text_bright</item>
+        <item name="colorOnBackground">@color/bright_pink_light</item>
 
         <!-- Поверхности -->
         <item name="colorSurface">@color/gray</item>
