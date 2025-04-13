@@ -3,7 +3,7 @@
     android:shape="rectangle">
 
     <!-- Светлый полупрозрачный фон с лёгким розоватым оттенком -->
-    <solid android:color="?attr/colorOnBackground" /> <!-- #F5E3F5 — нежно-сиреневый / розоватый -->
+    <solid android:color="?attr/colorBackground" /> <!-- #F5E3F5 — нежно-сиреневый / розоватый -->
 
     <corners android:radius="16dp" />
 

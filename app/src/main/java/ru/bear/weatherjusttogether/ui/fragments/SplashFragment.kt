@@ -91,6 +91,6 @@ class SplashFragment : Fragment() {
                     .commit()
                 (requireActivity() as? MainActivity)?.bottomNav?.visibility = View.VISIBLE
             }
-        }, 400)
+        }, 4000)
     }
 }

@@ -72,6 +72,7 @@ class DailyFragment : Fragment() {
         VMSettings(dailyAdapter)
     }
 
+
     // настройка кнопок
     private fun buttonsSettings()
     {

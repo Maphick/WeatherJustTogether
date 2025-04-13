@@ -1,242 +1,171 @@
 package ru.bear.weatherjusttogether.ui.fragments
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ru.bear.weatherjusttogether.R
 import ru.bear.weatherjusttogether.WeatherApp
 import ru.bear.weatherjusttogether.domain.models.HourlyWeatherDomain
 import ru.bear.weatherjusttogether.domain.models.TodayWeatherDomain
-import ru.bear.weatherjusttogether.utils.PressureUnit
 import ru.bear.weatherjusttogether.utils.SettingsManager
-import ru.bear.weatherjusttogether.utils.TemperatureUnit
 import ru.bear.weatherjusttogether.utils.WeatherUnitConverter
-import ru.bear.weatherjusttogether.utils.WindSpeedUnit
 import ru.bear.weatherjusttogether.viewmodel.HourlyForecastViewModel
 import ru.bear.weatherjusttogether.viewmodel.HourlyForecastViewModelFactory
 import ru.bear.weatherjusttogether.viewmodel.TodayForecastViewModel
 import ru.bear.weatherjusttogether.viewmodel.TodayForecastViewModelFactory
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
 class DetailedWeatherFragment : Fragment() {
     @Inject
     lateinit var todayForecastViewModelFactory: TodayForecastViewModelFactory
     private lateinit var todayForecastViewModel: TodayForecastViewModel
+
     @Inject
-    lateinit var hourlyМiewModelFactory: HourlyForecastViewModelFactory
+    lateinit var hourlyViewModelFactory: HourlyForecastViewModelFactory
     private lateinit var hourlyForecastViewModel: HourlyForecastViewModel
 
-    // хелпер для SharedPreferences
     private lateinit var settingsManager: SettingsManager
 
-    // UI
-    lateinit var cityNameText: TextView
-    lateinit var humidityText: TextView
-    lateinit var windText: TextView
-    lateinit var pressureText: TextView
-    lateinit var uvText: TextView
-    lateinit var visibilityText: TextView
-    lateinit var feelsLikeText: TextView
-    lateinit var precipitationText: TextView
-    lateinit var btnBack: ImageButton
-    lateinit var btnSettings: ImageButton
-    lateinit var topBar: View
+    private lateinit var cityNameText: TextView
+    private lateinit var btnBack: ImageButton
+    private lateinit var btnSettings: ImageButton
+    private lateinit var lineChart: LineChart
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as WeatherApp).appComponent.inject(this)
-        settingsManager = SettingsManager(context) //
+        settingsManager = SettingsManager(context)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
-        return inflater.inflate(R.layout.fragment_detailed_weather, container, false)
-    }
+    ): View = inflater.inflate(R.layout.fragment_detailed_weather, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         cityNameText = view.findViewById(R.id.city_name)
-        humidityText = view.findViewById(R.id.info_humidity)
-        windText = view.findViewById(R.id.info_wind)
-        pressureText = view.findViewById(R.id.info_pressure)
-        uvText = view.findViewById(R.id.info_uv)
-        visibilityText = view.findViewById(R.id.info_visibility)
-        feelsLikeText = view.findViewById(R.id.info_feels_like)
-        precipitationText = view.findViewById(R.id.info_pressure)
-        btnBack = view.findViewById<ImageButton>(R.id.btnBack)
-        btnSettings = view.findViewById<ImageButton>(R.id.btnSettings)
-        topBar = view.findViewById<View>(R.id.top_bar)
+        btnBack = view.findViewById(R.id.btnBack)
+        btnSettings = view.findViewById(R.id.btnSettings)
+        lineChart = view.findViewById(R.id.lineChart)
 
-        VMSettings()
-        buttonsSettings()
-    }
+        setupViewModels()
 
-    // настройка кнопок
-    private fun buttonsSettings()
-    {
-        (btnSettings.layoutParams as ViewGroup.MarginLayoutParams).apply {
-            topMargin = topBar.top - 100 // Перемещение на строку выше
+        bindInfoCard(view, R.id.info_humidity, "Влажность", "%") { it.humidity }
+        bindInfoCard(view, R.id.info_pressure, "Давление") {
+            WeatherUnitConverter.convertPressure(it.pressure_mb, settingsManager.pressureUnit)
         }
-        btnBack.setOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack()
+        bindInfoCard(view, R.id.info_uv, "УФ") { it.uv.toString() }
+        bindInfoCard(view, R.id.info_visibility, "Видимость", " км") { it.vis_km }
+        bindInfoCard(view, R.id.info_feels_like, "Ощущается") {
+            WeatherUnitConverter.convertTemperature(it.feelslike_c, settingsManager.temperatureUnit)
         }
+        bindInfoCard(view, R.id.info_precipitation, "Осадки", " мм") { it.precip_mm }
+        bindInfoCard(view, R.id.info_wind, "Ветер") {
+            WeatherUnitConverter.convertWind(it.wind_kph, it.wind_dir, settingsManager.windSpeedUnit)
+        }
+
+        btnBack.setOnClickListener { requireActivity().supportFragmentManager.popBackStack() }
         btnSettings.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer, SettingsFragment())
                 .addToBackStack(null)
                 .commit()
         }
+
+
+    }
+
+    private fun bindInfoCard(
+        view: View,
+        cardId: Int,
+        label: String,
+        suffix: String = "",
+        valueExtractor: (TodayWeatherDomain) -> Any?
+    ) {
+        val card = view.findViewById<View>(cardId)
+        val labelView = card.findViewById<TextView>(R.id.info_label)
+        val valueView = card.findViewById<TextView>(R.id.info_value)
+        labelView.text = label
+
+        todayForecastViewModel.weather.observe(viewLifecycleOwner) { weather ->
+            valueView.text = weather?.let { valueExtractor(it)?.toString()?.plus(suffix) } ?: "-"
+        }
     }
 
 
-    // настройка вью-модели
-    private fun VMSettings() {
+    @SuppressLint("SetTextI18n")
+    private fun setupViewModels() {
         todayForecastViewModel = ViewModelProvider(this, todayForecastViewModelFactory)
             .get(TodayForecastViewModel::class.java)
-        // Подписка на LiveData
-        todayForecastViewModel.weather.observe(viewLifecycleOwner) { weather ->
-            if (weather != null) {
-                // обновляем погоду
-                updateUI(weather)
-                // запрашиваем почасовую погоду
-                hourlyForecastViewModel.fetchForecastWithFallback(weather.city)
-            }
-        }
-        hourlyForecastViewModel = ViewModelProvider(this, hourlyМiewModelFactory)
+        hourlyForecastViewModel = ViewModelProvider(this, hourlyViewModelFactory)
             .get(HourlyForecastViewModel::class.java)
-        // Подписка на LiveData
+
+        todayForecastViewModel.weather.observe(viewLifecycleOwner) { weather ->
+            cityNameText.text = "${weather?.city}, ${weather?.region}, ${weather?.country}"
+            hourlyForecastViewModel.fetchForecastWithFallback(weather?.city)
+        }
+
         hourlyForecastViewModel.hourlyForecast.observe(viewLifecycleOwner) { hourlyData ->
-            hourlyData?.let {
-                if (hourlyData.isNotEmpty()) {
-                    updateChart(hourlyData)
-                }
-            }
+            if (!hourlyData.isNullOrEmpty()) updateChart(hourlyData)
         }
     }
-
-
-
-    private fun updateUI(weather: TodayWeatherDomain) {
-        view?.let {
-            cityNameText.text = "${weather.city}, ${weather.region}, ${weather.country}"
-            humidityText.text = "${weather.humidity}%"
-            uvText.text = weather.uv.toString()
-            visibilityText.text = "${weather.vis_km} км"
-            precipitationText.text = "${weather.precip_mm} мм"
-
-            // Температура (с учётом настроек)
-            feelsLikeText.text = WeatherUnitConverter.convertTemperature(weather.feelslike_c, settingsManager.temperatureUnit)
-            // Ветер
-            windText.text = WeatherUnitConverter.convertWind(weather.wind_kph, weather.wind_dir, settingsManager.windSpeedUnit)
-            // Давление
-            pressureText.text = WeatherUnitConverter.convertPressure(weather.pressure_mb, settingsManager.pressureUnit)
-
-        }
-    }
-
 
     private fun updateChart(hourlyData: List<HourlyWeatherDomain>) {
-        // Получаем цвета из ресурсов
-        val lineColor = ContextCompat.getColor(requireContext(), R.color.bright_purple_dark)
-        val circleColor = ContextCompat.getColor(requireContext(), R.color.sun)
-        var textColor = ContextCompat.getColor(requireContext(), R.color.text_bright)
-        var fillColor = ContextCompat.getColor(requireContext(), R.color.bright_pink_medium) // Цвет под графиком
-        var gridColor = ContextCompat.getColor(requireContext(), R.color.bright_purple_light)
-
-        val lineChart: LineChart = requireView().findViewById(R.id.lineChart)
-
-        val labels = mutableMapOf<Float, String>()
-        val xAxisLabels = mutableMapOf<Int, String>()
-
-        // Задаем фиксированные позиции для подписей
-        val labelPositions = listOf(0, 6, 12, 18, 24)
-        val labelNames = mapOf(
-            0 to "Ночь",
-            6 to "Утро",
-            12 to "День",
-            18 to "Вечер",
-            24 to "Ночь"
-        )
-
-        for (i in hourlyData.indices) {
-            val hour = hourlyData[i]
-            val timeInHours = i.toFloat()
-
-            // Добавляем подписи только на фиксированных позициях
-            if (labelPositions.contains(i)) {
-                labels[timeInHours] = "${hour.temp_c}°C"
-                xAxisLabels[i] = labelNames[i] ?: ""
-            }
-        }
-
-        // Данные для графика: температура в разное время дня
-        val timeLabels = arrayOf("Утро", "День", "Вечер", "Ночь") // Метки оси X
-        val timePositions = listOf(6, 12, 18, 0) // Утро, День, Вечер, Ночь (полночь)
-
+        val timeLabels = listOf("Утро", "День", "Вечер", "Ночь")
+        val timePositions = listOf(6, 12, 18, 0)
         val entries = mutableListOf<Entry>()
-        for ((index, time) in timePositions.withIndex()) {
+        val labels = mutableMapOf<Float, String>()
+
+        for ((index, hour) in timePositions.withIndex()) {
             val hourData = hourlyData.find {
-                it.time.substring(11, 13).toInt() == time // Формат времени: "YYYY-MM-DD HH:MM"
+                it.time.substring(11, 13).toIntOrNull() == hour
             }
             if (hourData != null) {
                 entries.add(Entry(index.toFloat(), hourData.temp_c.toFloat()))
+                labels[index.toFloat()] = WeatherUnitConverter.convertTemperature(
+                    hourData.temp_c,
+                    settingsManager.temperatureUnit
+                )
             }
         }
 
-        // Проверяем, есть ли данные перед обновлением графика
-        if (entries.isEmpty()) return
-
         val dataSet = LineDataSet(entries, "Температура").apply {
-            color = lineColor
+            color = ContextCompat.getColor(requireContext(), R.color.bright_purple_dark)
             valueTextSize = 12f
             lineWidth = 3f
             circleRadius = 7f
             setDrawValues(true)
-            setCircleColor(circleColor)
+            setCircleColor(ContextCompat.getColor(requireContext(), R.color.sun))
             setDrawCircles(true)
-            mode = LineDataSet.Mode.CUBIC_BEZIER  // Плавные линии
+            mode = LineDataSet.Mode.CUBIC_BEZIER
             setDrawFilled(true)
             fillColor = Color.CYAN
             fillAlpha = 50
-
             valueFormatter = object : ValueFormatter() {
-                override fun getPointLabel(entry: Entry?): String {
-                    return labels[entry?.x] ?: "" // Подпись только если метка есть
-                }
+                override fun getPointLabel(entry: Entry?): String = labels[entry?.x] ?: ""
             }
         }
 
-        val lineData = LineData(dataSet)
-        lineChart.data = lineData
-
-        // Настройки графика
         lineChart.apply {
+            data = LineData(dataSet)
             description.isEnabled = false
             setTouchEnabled(true)
             setPinchZoom(true)
@@ -244,23 +173,25 @@ class DetailedWeatherFragment : Fragment() {
             setGridBackgroundColor(Color.TRANSPARENT)
             setDrawGridBackground(false)
             animateX(1000)
+
             xAxis.apply {
-                setDrawGridLines(false)
                 position = XAxis.XAxisPosition.BOTTOM
-                textColor = textColor
+                textColor = ContextCompat.getColor(requireContext(), R.color.text_bright)
                 textSize = 16f
                 granularity = 1f
-                labelCount = timeLabels.size  // Количество меток по оси X
+                labelCount = timeLabels.size
+                setDrawGridLines(false)
                 valueFormatter = IndexAxisValueFormatter(timeLabels)
             }
 
             axisLeft.apply {
                 setDrawGridLines(true)
-                gridColor = gridColor
-                textColor = textColor
+                gridColor = ContextCompat.getColor(requireContext(), R.color.bright_purple_light)
+                textColor = ContextCompat.getColor(requireContext(), R.color.text_bright)
                 textSize = 16f
             }
-            axisRight.isEnabled = false // Отключаем правую ось
+
+            axisRight.isEnabled = false
         }
     }
 }

@@ -1,68 +1,94 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@drawable/rounded_transparent_bg"
     android:padding="16dp"
-    android:layout_margin="8dp"
+    android:layout_margin="12dp"
     android:elevation="4dp">
-
-    <!-- Иконка погоды -->
-    <ImageView
-        android:id="@+id/conditionIcon"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        app:tint="?attr/colorAccent" />
 
     <!-- Дата -->
     <TextView
         android:id="@+id/dateText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/conditionIcon"
-        android:layout_marginStart="16dp"
-        android:textSize="25sp"
-        android:textColor="?attr/colorTitle"
-        android:fontFamily="sans-serif-medium"
-        android:textStyle="bold" />
-
-    <!-- Описание погоды -->
-    <TextView
-        android:id="@+id/conditionText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/dateText"
-        android:layout_toEndOf="@id/conditionIcon"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
-        android:textSize="20sp"
+        android:text="Понедельник, 8 апреля"
         android:textColor="?attr/colorOnBackground"
-        android:fontFamily="sans-serif-medium" />
-
-    <!-- Максимальная температура -->
-    <TextView
-        android:id="@+id/maxTempText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="16dp"
-        android:textSize="30sp"
-        android:textColor="?attr/colorPrimary"
-        android:fontFamily="sans-serif-medium"
-        android:textStyle="bold" />
-
-    <!-- Минимальная температура -->
-    <TextView
-        android:id="@+id/minTempText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/maxTempText"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="4dp"
         android:textSize="22sp"
-        android:textColor="?attr/colorSecondary"
+        android:textStyle="bold"
         android:fontFamily="sans-serif-medium" />
-</RelativeLayout>
+
+    <!-- Температуры -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/maxTempText"
+            android:layout_width="65.dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="18°C"
+            android:textColor="?attr/colorSurface"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/minTempText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12°C"
+            android:textColor="?attr/colorSurface"
+            android:textSize="20sp"/>
+    </LinearLayout>
+
+    <!-- Иконка и параметры -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp">
+
+        <ImageView
+            android:id="@+id/conditionIcon"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:src="@drawable/ic_cloudy"
+            app:tint="?attr/colorPrimary"
+            android:layout_marginEnd="24dp"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Условие погоды -->
+            <TextView
+                android:id="@+id/conditionText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Пасмурно"
+                android:textColor="?attr/colorOnPrimary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="sans-serif-medium" />
+
+            <!-- Параметры с акцентом -->
+            <include layout="@layout/item_info_accent" android:id="@+id/info_humidity" />
+            <include layout="@layout/item_info_accent" android:id="@+id/info_wind" />
+            <include layout="@layout/item_info_accent" android:id="@+id/info_pressure" />
+            <include layout="@layout/item_info_accent" android:id="@+id/info_visibility" />
+            <include layout="@layout/item_info_accent" android:id="@+id/info_feels_like" />
+            <include layout="@layout/item_info_accent" android:id="@+id/info_precipitation" />
+            <include layout="@layout/item_info_accent" android:id="@+id/info_uv" />
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

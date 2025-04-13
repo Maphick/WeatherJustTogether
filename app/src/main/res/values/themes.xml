@@ -5,7 +5,7 @@
 
         <!-- Основные цвета -->
         <item name="colorPrimary">@color/bright_purple_medium</item>
-        <item name="colorOnPrimary">@color/text_bright</item>
+        <item name="colorOnPrimary">@color/bright_purple_medium</item>
 
         <item name="colorSecondary">@color/bright_pink_medium</item>
         <item name="colorOnSecondary">@color/text_bright</item>
@@ -14,8 +14,8 @@
         <item name="colorOnTertiary">@color/text_bright</item>
 
         <!-- Фон -->
-        <item name="colorBackground">@color/bright_purple_light</item>
-        <item name="colorOnBackground">@color/text_bright</item>
+        <item name="colorBackground">@color/light_gray</item>
+        <item name="colorOnBackground">@color/bright_purple_light</item>
 
         <!-- Поверхности -->
         <item name="colorSurface">@color/bright_pink_light</item>
