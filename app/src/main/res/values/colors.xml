@@ -26,6 +26,7 @@
 
         <color name="weather_icon_color">#FF6EC7</color> <!-- для иконок -->
 
+        <color name="text_hint">#888888</color>
 
         <color name="sunny_color">#FFD700</color> <!-- Ярко-желтый -->
         <color name="cloudy_color">#949393</color> <!-- Серый -->

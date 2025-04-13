@@ -33,6 +33,8 @@ import ru.bear.weatherjusttogether.R
 import ru.bear.weatherjusttogether.data.remote.network.models.Location
 import ru.bear.weatherjusttogether.domain.models.HourlyWeatherDomain
 import ru.bear.weatherjusttogether.domain.models.TodayWeatherDomain
+import ru.bear.weatherjusttogether.utils.SettingsManager
+import ru.bear.weatherjusttogether.utils.WeatherUnitConverter
 import ru.bear.weatherjusttogether.viewmodel.DailyForecastViewModel
 
 class TodayWeatherFragment : Fragment() {
@@ -40,6 +42,8 @@ class TodayWeatherFragment : Fragment() {
     lateinit var todayForecastViewModelFactory: TodayForecastViewModelFactory
     private lateinit var todayForecastViewModel: TodayForecastViewModel
 
+    // хелпер для SharedPreferences
+    private lateinit var settingsManager: SettingsManager
     lateinit var searchInput: EditText
     lateinit var searchButton: Button
     lateinit var suggestionsList: ListView
@@ -56,6 +60,7 @@ class TodayWeatherFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as WeatherApp).appComponent.inject(this)
+        settingsManager = SettingsManager(context)
     }
 
     override fun onCreateView(
@@ -228,7 +233,8 @@ class TodayWeatherFragment : Fragment() {
     private fun updateUI(weather: TodayWeatherDomain) {
         weather?.let {
             cityNameText.text = "${it.city}, ${it.region}, ${it.country}"
-            temperatureText.text = "${it.temp_c}°C"
+            // Использовать настройки при отображении
+            temperatureText.text = WeatherUnitConverter.convertTemperature(it.temp_c, settingsManager.temperatureUnit)
             conditionText.text = it.conditionText
             Glide.with(this).load("https:${it.conditionIcon}").into(weatherIcon)
 

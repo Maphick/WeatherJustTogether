@@ -1,0 +1,9 @@
+<resources>
+        <!-- Кастомные атрибуты для темы -->
+        <attr name="colorTitle" format="color" />
+        <attr name="colorPrimaryText" format="color" />
+        <attr name="colorSecondaryText" format="color" />
+        <attr name="colorAccent" format="color" />
+        <attr name="colorBackground" format="color" />
+</resources>
+

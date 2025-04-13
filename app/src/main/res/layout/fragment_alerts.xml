@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bright_purple_light"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="?attr/colorBackground">
 
     <!-- Фоновое изображение -->
     <ImageView
@@ -23,21 +23,20 @@
         android:layout_marginTop="40dp"
         android:elevation="6dp">
 
+        <!-- Заголовок -->
         <TextView
             android:id="@+id/alerts_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text = "Предупреждения"
+            android:text="Предупреждения"
             android:textSize="34sp"
-            android:textColor="@color/bright_pink_dark"
+            android:textColor="?attr/colorAccent"
             android:textStyle="bold"
-            android:shadowColor="@color/bright_purple_dark"
+            android:shadowColor="?attr/colorTitle"
             android:shadowRadius="3"
             android:shadowDx="1"
-            android:shadowDy="1"/>
-
-
-
+            android:shadowDy="1" />
+    </RelativeLayout>
 
     <!-- Сообщение "Нет предупреждений" -->
     <TextView
@@ -46,11 +45,10 @@
         android:layout_height="wrap_content"
         android:text="Нет предупреждений"
         android:textSize="18sp"
-        android:textColor="@color/text_bright"
-        android:layout_below="@id/alerts_title"
+        android:textColor="?attr/colorOnBackground"
+        android:layout_below="@id/top_bar"
         android:layout_centerHorizontal="true"
-        android:visibility="gone"/>
-
+        android:visibility="gone" />
 
     <!-- Список предупреждений -->
     <androidx.recyclerview.widget.RecyclerView
@@ -58,9 +56,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/no_alerts_message"
-        android:padding="8dp"/>
+        android:padding="8dp" />
 
 </RelativeLayout>
-
-</RelativeLayout>
-

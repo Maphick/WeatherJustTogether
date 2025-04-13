@@ -1,8 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bright_purple_light"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="?attr/colorBackground">
 
     <!-- Фоновое изображение -->
     <ImageView
@@ -42,7 +42,6 @@
                 android:padding="0dp" />
         </FrameLayout>
 
-
         <!-- Заголовок -->
         <TextView
             android:id="@+id/page_name"
@@ -51,13 +50,14 @@
             android:layout_centerInParent="true"
             android:text="Подробный прогноз"
             android:textSize="42sp"
-            android:textColor="@color/text_bright"
+            android:textColor="?attr/colorTitle"
             android:fontFamily="@font/greatvibesregular"
             android:textStyle="bold"
             android:shadowColor="#80000000"
             android:shadowDx="2"
             android:shadowDy="2"
             android:shadowRadius="3" />
+
         <!-- Кнопка Настройки -->
         <FrameLayout
             android:id="@+id/settings_button_container"
@@ -80,6 +80,7 @@
         </FrameLayout>
     </RelativeLayout>
 
+    <!-- Название города -->
     <LinearLayout
         android:id="@+id/city_info"
         android:layout_width="match_parent"
@@ -88,22 +89,21 @@
         android:gravity="left"
         android:orientation="horizontal"
         android:paddingStart="16dp">
-        <!-- Название города -->
+
         <TextView
             android:id="@+id/city_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="0.dp"
             android:layout_marginTop="10dp"
-            android:fontFamily="@font/greatvibesregular"
+            android:fontFamily="sans-serif-medium"
             android:text=""
-            android:textColor="@color/bright_purple_dark"
+            android:textColor="?attr/colorTitle"
             android:textSize="34sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Дополнительная информация (ветер, влажность, давление) -->
+    <!-- Карточки дополнительной информации -->
+    <!-- Блок: Ветер, Влажность, Давление -->
     <LinearLayout
         android:id="@+id/additional_info"
         android:layout_width="match_parent"
@@ -114,89 +114,30 @@
         android:orientation="horizontal"
         android:padding="16dp">
 
-        <LinearLayout
+        <!-- Каждая карточка -->
+        <include
+            android:id="@+id/info_wind"
+            layout="@layout/info_item"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_weight="1" />
 
-            <TextView
-                android:id="@+id/wind_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/greatvibesregular"
-                android:text="Ветер"
-                android:textColor="@color/text_bright"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/wind_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/greatvibesregular"
-                android:text="7.2 км/ч, S"
-                android:textColor="@color/text_bright"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <LinearLayout
+        <include
+            android:id="@+id/info_humidity"
+            layout="@layout/info_item"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_weight="1" />
 
-            <TextView
-                android:id="@+id/humidity_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/greatvibesregular"
-                android:text="Влажность"
-                android:textColor="@color/text_bright"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/humidity_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/greatvibesregular"
-                android:text="87%"
-                android:textColor="@color/text_bright"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <LinearLayout
+        <include
+            android:id="@+id/info_pressure"
+            layout="@layout/info_item"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/pressure_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/greatvibesregular"
-                android:text="Давление"
-                android:textColor="@color/text_bright"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/pressure_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/greatvibesregular"
-                android:text="1015 hPa"
-                android:textColor="@color/text_bright"
-                android:textSize="18sp" />
-        </LinearLayout>
+            android:layout_weight="1" />
     </LinearLayout>
 
-    <!-- Видимость, УФ-индекс, Осадки -->
+    <!-- Блок: Видимость, Ощущается как, Осадки -->
     <LinearLayout
         android:id="@+id/additional_visibility"
         android:layout_width="match_parent"
@@ -207,89 +148,29 @@
         android:orientation="horizontal"
         android:padding="16dp">
 
-        <LinearLayout
+        <include
+            android:id="@+id/info_visibility"
+            layout="@layout/info_item"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_weight="1" />
 
-            <TextView
-                android:id="@+id/visibility_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/greatvibesregular"
-                android:text="Видимость"
-                android:textColor="@color/text_bright"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/visibility_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/greatvibesregular"
-                android:text="10 км"
-                android:textColor="@color/text_bright"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <LinearLayout
+        <include
+            android:id="@+id/info_feels_like"
+            layout="@layout/info_item"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_weight="1" />
 
-            <TextView
-                android:id="@+id/feels_like_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/greatvibesregular"
-                android:text="Ощущается как"
-                android:textColor="@color/text_bright"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/feels_like_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/greatvibesregular"
-                android:text="5°C"
-                android:textColor="@color/text_bright"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <LinearLayout
+        <include
+            android:id="@+id/info_precipitation"
+            layout="@layout/info_item"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/precipitation_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/greatvibesregular"
-                android:text="Осадки"
-                android:textColor="@color/text_bright"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/precipitation_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/greatvibesregular"
-                android:text="2 мм"
-                android:textColor="@color/text_bright"
-                android:textSize="18sp" />
-        </LinearLayout>
+            android:layout_weight="1" />
     </LinearLayout>
 
-
+    <!-- Блок: УФ индекс -->
     <LinearLayout
         android:id="@+id/additional_uv"
         android:layout_width="match_parent"
@@ -300,43 +181,21 @@
         android:orientation="horizontal"
         android:padding="16dp">
 
-        <LinearLayout
+        <include
+            android:id="@+id/info_uv"
+            layout="@layout/info_item"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/uv_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/greatvibesregular"
-                android:text="УФ-индекс"
-                android:textColor="@color/text_bright"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/uv_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/greatvibesregular"
-                android:text="5"
-                android:textColor="@color/text_bright"
-                android:textSize="18sp" />
-        </LinearLayout>
+            android:layout_weight="1" />
     </LinearLayout>
 
-    <!-- График температуры -->
+    <!-- График -->
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/lineChart"
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:layout_below="@id/additional_uv"
         android:layout_margin="16dp"
-        android:layout_marginTop="142dp"
-        android:layout_marginBottom="16dp"
         android:elevation="6dp"
         android:padding="16dp" />
 </RelativeLayout>
