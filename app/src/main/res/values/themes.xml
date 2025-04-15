@@ -8,7 +8,7 @@
         <item name="colorOnPrimary">@color/bright_purple_medium</item>
 
         <item name="colorSecondary">@color/bright_pink_medium</item>
-        <item name="colorOnSecondary">@color/text_bright</item>
+        <item name="colorOnSecondary">@color/text_dark</item>
 
         <item name="colorTertiary">@color/gradient_start</item>
         <item name="colorOnTertiary">@color/text_bright</item>
@@ -18,7 +18,7 @@
         <item name="colorOnBackground">@color/bright_purple_light</item>
 
         <!-- Поверхности -->
-        <item name="colorSurface">@color/bright_pink_light</item>
+        <item name="colorSurface">@color/cloudy_color</item>
         <item name="colorOnSurface">@color/text_dark</item>
 
         <!-- Дополнительные цвета -->

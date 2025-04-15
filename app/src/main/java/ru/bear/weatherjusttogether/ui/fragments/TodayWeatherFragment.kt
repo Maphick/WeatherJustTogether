@@ -3,6 +3,7 @@ package ru.bear.weatherjusttogether.ui.fragments
 import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
+import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,12 +17,20 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.github.mikephil.charting.charts.LineChart
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -36,8 +45,19 @@ import ru.bear.weatherjusttogether.domain.models.TodayWeatherDomain
 import ru.bear.weatherjusttogether.utils.SettingsManager
 import ru.bear.weatherjusttogether.utils.WeatherUnitConverter
 import ru.bear.weatherjusttogether.viewmodel.DailyForecastViewModel
+import java.io.IOException
+import java.util.Locale
 
-class TodayWeatherFragment : Fragment() {
+class TodayWeatherFragment : Fragment(), OnMapReadyCallback {
+    //  для карт
+    private lateinit var googleMap: GoogleMap
+    private var selectedMarker: Marker? = null
+
+    // временное хранилище координат
+    private var pendingCityLatLng: LatLng? = null
+    private var pendingCityName: String? = null
+
+
     @Inject
     lateinit var todayForecastViewModelFactory: TodayForecastViewModelFactory
     private lateinit var todayForecastViewModel: TodayForecastViewModel
@@ -45,7 +65,7 @@ class TodayWeatherFragment : Fragment() {
     // хелпер для SharedPreferences
     private lateinit var settingsManager: SettingsManager
     lateinit var searchInput: EditText
-    lateinit var searchButton: Button
+    lateinit var searchButton: ImageButton
     lateinit var suggestionsList: ListView
     lateinit var cityNameText: TextView
     lateinit var temperatureText: TextView
@@ -74,9 +94,14 @@ class TodayWeatherFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // инициализация карты
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as? SupportMapFragment
+        mapFragment?.getMapAsync(this)
+
+
         topBar = view.findViewById<View>(R.id.top_bar)
         searchInput = view.findViewById<EditText>(R.id.search_input)
-        searchButton = view.findViewById<Button>(R.id.btnSearch)
+        searchButton = view.findViewById<ImageButton>(R.id.btnSearch)
         suggestionsList = view.findViewById<ListView>(R.id.suggestions_list)
         cityNameText = view.findViewById<TextView>(R.id.city_name)
         temperatureText = view.findViewById<TextView>(R.id.temperature_value)
@@ -194,19 +219,44 @@ class TodayWeatherFragment : Fragment() {
 
                     // если кликнули по городу
                     suggestionsList.setOnItemClickListener { _, _, position, _ ->
-                        // выбранный город
                         val selectedCity = locations[position]
+                        val cityFullName = "${selectedCity.name}, ${selectedCity.region}, ${selectedCity.country}"
 
                         lifecycleScope.launch {
-                            // Сохранится в базе
                             todayForecastViewModel.saveCityToRoom(selectedCity.name)
                         }
 
                         searchInput.setText(selectedCity.name)
-                        cityNameText.text =
-                            "${selectedCity.name}, ${selectedCity.region}, ${selectedCity.country}"
+                        cityNameText.text = cityFullName
                         suggestionsList.visibility = View.GONE
+
+                        // Геокодинг: получить координаты города и отобразить на карте
+                        val geocoder = Geocoder(requireContext(), Locale.getDefault())
+                        try {
+                            val addressList = geocoder.getFromLocationName(cityFullName, 1)
+                            if (addressList != null && addressList.isNotEmpty()) {
+                                val location = addressList[0]
+                                val latLng = LatLng(location.latitude, location.longitude)
+
+                                if (::googleMap.isInitialized) {
+                                    selectedMarker?.remove()
+                                    selectedMarker = googleMap.addMarker(
+                                        MarkerOptions().position(latLng).title(cityFullName)
+                                    )
+                                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
+                                } else {
+                                    // если карта еще не готова – сохраняем данные
+                                    pendingCityLatLng = latLng
+                                    pendingCityName = cityFullName
+                                }
+                            } else {
+                                Toast.makeText(requireContext(), "Не удалось найти координаты города", Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: IOException) {
+                            Toast.makeText(requireContext(), "Ошибка геокодинга: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                        }
                     }
+
 
                 }
             }
@@ -232,7 +282,8 @@ class TodayWeatherFragment : Fragment() {
     // обновляем отображение
     private fun updateUI(weather: TodayWeatherDomain) {
         weather?.let {
-            cityNameText.text = "${it.city}, ${it.region}, ${it.country}"
+            val cityFullName = "${it.city}, ${it.region}, ${it.country}"
+            cityNameText.text = cityFullName
             // Использовать настройки при отображении
             temperatureText.text = WeatherUnitConverter.convertTemperature(it.temp_c, settingsManager.temperatureUnit)
             conditionText.text = it.conditionText
@@ -258,8 +309,97 @@ class TodayWeatherFragment : Fragment() {
             colorRes?.let {
                 weatherIcon.setColorFilter(ContextCompat.getColor(requireContext(), it), PorterDuff.Mode.SRC_IN)
             } ?: weatherIcon.clearColorFilter()
+
+            // Добавление маркера на карту
+            val geocoder = Geocoder(requireContext(), Locale.getDefault())
+            try {
+                val addressList = geocoder.getFromLocationName(cityFullName, 1)
+                if (!addressList.isNullOrEmpty()) {
+                    val address = addressList[0]
+                    val latLng = LatLng(address.latitude, address.longitude)
+
+                    googleMap.let { map ->
+                        selectedMarker?.remove()
+                        selectedMarker = map.addMarker(
+                            MarkerOptions().position(latLng).title(weather.city)
+                        )
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
+                    }
+                }
+                else {
+
+                }
+            } catch (e: IOException) {
+                Log.e("TodayWeatherFragment", "Geocoding error: ${e.message}")
+            }
         }
     }
+
+    // выбор города по тапу на карту
+    override fun onMapReady(map: GoogleMap) {
+        googleMap = map
+
+        // если до карты уже был выбран город
+        if (pendingCityLatLng != null && pendingCityName != null) {
+            selectedMarker = googleMap.addMarker(
+                MarkerOptions().position(pendingCityLatLng!!).title(pendingCityName)
+            )
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pendingCityLatLng!!, 10f))
+            pendingCityLatLng = null
+            pendingCityName = null
+        } else {
+            // иначе пробуем получить координаты из текста города
+            val currentCity = cityNameText.text.toString().trim()
+            if (currentCity.isNotEmpty()) {
+                val geocoder = Geocoder(requireContext(), Locale.getDefault())
+                try {
+                    val addressList = geocoder.getFromLocationName(currentCity, 1)
+                    if (!addressList.isNullOrEmpty()) {
+                        val address = addressList[0]
+                        val latLng = LatLng(address.latitude, address.longitude)
+                        selectedMarker = googleMap.addMarker(
+                            MarkerOptions().position(latLng).title(currentCity)
+                        )
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
+                    } else {
+                        moveToDefault()
+                    }
+                } catch (e: IOException) {
+                    Log.e("Map", "Geocoding error: ${e.message}")
+                    moveToDefault()
+                }
+            } else {
+                moveToDefault()
+            }
+        }
+
+        // обработка тапов по карте
+        googleMap.setOnMapClickListener { latLng ->
+            selectedMarker?.remove()
+            selectedMarker = googleMap.addMarker(
+                MarkerOptions().position(latLng).title("Вы выбрали")
+            )
+
+            val geocoder = Geocoder(requireContext(), Locale.getDefault())
+            try {
+                val addressList = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+                val city = addressList?.firstOrNull()?.locality ?: return@setOnMapClickListener
+
+                Toast.makeText(requireContext(), "Город: $city", Toast.LENGTH_SHORT).show()
+                searchInput.setText(city)
+                todayForecastViewModel.saveCityToRoom(city)
+            } catch (e: IOException) {
+                Toast.makeText(requireContext(), "Не удалось определить город", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun moveToDefault() {
+        val defaultLocation = LatLng(55.7558, 37.6173) // Москва
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 5f))
+    }
+
+
 
 
 }

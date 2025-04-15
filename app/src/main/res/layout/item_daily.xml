@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Понедельник, 8 апреля"
-        android:textColor="?attr/colorOnBackground"
+        android:textColor="?attr/colorPrimary"
         android:textSize="22sp"
         android:textStyle="bold"
         android:fontFamily="sans-serif-medium" />
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:text="18°C"
-            android:textColor="?attr/colorSurface"
+            android:textColor="?attr/colorOnBackground"
             android:textSize="28sp"
             android:textStyle="bold" />
 
@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="12°C"
-            android:textColor="?attr/colorSurface"
+            android:textColor="?attr/colorOnBackground"
             android:textSize="20sp"/>
     </LinearLayout>
 
@@ -58,7 +58,7 @@
             android:id="@+id/conditionIcon"
             android:layout_width="72dp"
             android:layout_height="72dp"
-            android:src="@drawable/ic_cloudy"
+            android:src="@drawable/ic_cloudly"
             app:tint="?attr/colorPrimary"
             android:layout_marginEnd="24dp"/>
 
