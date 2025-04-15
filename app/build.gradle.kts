@@ -104,4 +104,7 @@ dependencies {
     kapt(libs.room.compiler)
     // LIFECYCLE
     implementation(libs.lifecycle.runtime.ktx) // 🔹 Теперь используем alias из `libs.versions.toml`
+    // MAPS
+    implementation(libs.google.maps)
+    implementation(libs.google.location)
 }

@@ -21,7 +21,7 @@ object WeatherUnitConverter {
 
     fun convertPressure(hPa: Double, unit: PressureUnit): String {
         return when (unit) {
-            PressureUnit.HPA -> "${hPa.roundToInt()} hPa"
+            PressureUnit.HPA -> "${hPa.roundToInt()} гПа"
             PressureUnit.MMHG -> "${(hPa * 0.750063755).roundToInt()} мм рт. ст."
             PressureUnit.ATM -> "%.2f атм".format(hPa / 1013.25)
             PressureUnit.BAR -> "%.2f бар".format(hPa / 1000)

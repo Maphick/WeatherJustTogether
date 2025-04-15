@@ -79,16 +79,15 @@ class HourlyAdapter(
             condition.contains("солнечно") ||   condition.contains("ясно") || condition.contains("sunny") || condition.contains("clear") ->
                 R.color.bright_yellow
             condition.contains("пасмурно") || condition.contains("облачн") || condition.contains("cloudy") || condition.contains("overcast") ->
-                R.color.light_gray
-
+                R.color.bright_purple_light
             condition.contains("гроз") || condition.contains("storm") ->
-                R.color.dark_blue
+                R.color.gray
             condition.contains("дожд") || condition.contains("rain") ->
                 R.color.rainy_color
             condition.contains("снег") || condition.contains("snow") ->
                 R.color.white
             condition.contains("дым") ||condition.contains("туман") || condition.contains("mist") || condition.contains("fog") ->
-                R.color.gray
+                R.color.light_gray
             else -> null
         }
 

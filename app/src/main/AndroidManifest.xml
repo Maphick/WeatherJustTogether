@@ -15,6 +15,12 @@ xmlns:tools="http://schemas.android.com/tools">
         android:fullBackupContent="@xml/backup_rules"
         android:supportsRtl="true"
         tools:targetApi="31">
+
+        <!-- Google Maps API key -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyD7wE6kO3qhWCsEYRgYJld4TKZKHwPbWks" />
+
         <activity
             android:name=".MainActivity"
             android:theme="@style/Theme.WeatherApp.Splash"
