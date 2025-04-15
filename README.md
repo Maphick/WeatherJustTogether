@@ -37,7 +37,7 @@
 <table>
   <tr>
     <th>Splash</th>
-    <th>Поиск/th>
+    <th>Поиск</th>
     <th>Сегодня</th>
     <th>Подробнее</th>
     <th>Почасовой</th>
@@ -62,7 +62,7 @@
 <table>
   <tr>
     <th>Splash</th>
-    <th>Поиск/th>
+    <th>Поиск</th>
     <th>Сегодня</th>
     <th>Подробнее</th>
     <th>Почасовой</th>
